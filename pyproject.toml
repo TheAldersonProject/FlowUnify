@@ -114,3 +114,9 @@ split-on-trailing-comma = true
 relative-imports-order = "closest-to-furthest"
 force-single-line = false
 force-wrap-aliases = false
+
+[tool.git-changelog]
+format = "markdown"
+output = "CHANGELOG.md"
+since = "HEAD~1"
+until = "HEAD"

@@ -42,7 +42,7 @@ help:
 install:
 	rm -rf .venv
 	python3 -m pip install --upgrade pip
-	python3 -m pip install -r requirements.txt
+	python3 -m pip install uv
 	uv python install $(UV_PY_INSTALL_VERSION)
 	uv venv $(UV_PY_VERSION) $(UV_ENV_ARGS)
 	uv sync

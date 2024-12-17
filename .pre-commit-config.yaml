@@ -1,27 +1,37 @@
 exclude: typings
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
-    -   id: trailing-whitespace
-    -   id: check-yaml
-    -   id: check-added-large-files
-    -   id: check-toml
-    -   id: debug-statements
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-toml
+      - id: debug-statements
 
--   repo: https://github.com/charliermarsh/ruff-pre-commit
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.8.2
     hooks:
-    -   id: ruff
-        args: [--fix]
-    -   id: ruff-format
+      - id: ruff
+        args: [ --fix ]
+      - id: ruff-format
 
--   repo: https://github.com/RobertCraigie/pyright-python
+  - repo: https://github.com/RobertCraigie/pyright-python
     rev: v1.1.389
     hooks:
-    -   id: pyright
+      - id: pyright
 
--   repo: https://github.com/crate-ci/typos
+  - repo: https://github.com/crate-ci/typos
     rev: typos-dict-v0.11.37
     hooks:
-    -   id: typos
+      - id: typos
+
+  - repo: local
+    hooks:
+      - id: generate-changelog
+        name: Generate Changelog
+        entry: bash -c 'gitchangelog > CHANGELOG.md && git add CHANGELOG.md'
+        language: system
+        pass_filenames: false
+        stages: [ push ]
+        branches: [ main,master ]

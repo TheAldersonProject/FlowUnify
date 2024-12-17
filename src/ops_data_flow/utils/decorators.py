@@ -1,4 +1,4 @@
-#whoami: examples/ops_data_flow/utils/decorators.py
+#whoami: src/ops_data_flow/utils/decorators.py
 """OpsDataFlow Decorators."""
 
 import threading

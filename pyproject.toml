@@ -52,7 +52,7 @@ exclude = [
     "./examples/**/*",
     "./typings",
     "./setup.py",
-    "**/decorators.py"
+    "/**/decorators.py"
 ]
 
 [tool.ruff.lint]
@@ -79,7 +79,7 @@ exclude = [
     "./examples/**/*",
     "./typings",
     "./setup.py",
-    "**/decorators.py"
+    "/**/decorators.py"
 ]
 typeCheckingMode = "strict"
 reportMissingTypeStubs = true

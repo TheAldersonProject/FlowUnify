@@ -166,11 +166,9 @@ regexps = [
 ]
 
 [[tool.gitchangelog.sections]]
-name = "Maintenance"
-regexps = [
-    "^chore\\s*:\\s*([^\\n]*)$",
-    "^maintain\\s*:\\s*([^\\n]*)$"
-]
+name = "All Changes"
+regexps = ["^.*$"]  # This will match everything
+
 
 ignore_regexps = [
     "@minor", "!minor",

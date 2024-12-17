@@ -115,10 +115,92 @@ relative-imports-order = "closest-to-furthest"
 force-single-line = false
 force-wrap-aliases = false
 
-[tool.git-changelog]
-format = "markdown"
-output = "CHANGELOG.md"
-since = "HEAD~1"
-until = "HEAD"
-convention = "conventionalcommits"
-sections = ["Features", "Fixes", "Docs", "Tests"]
+[tool.gitchangelog]
+output_file = "CHANGELOG.md"
+tag_filter_regexp = "^v[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
+
+[[tool.gitchangelog.sections]]
+name = "Breaking Changes"
+regexps = [
+    "^break\\s*:\\s*([^\\n]*)$",
+    "^breaking\\s*:\\s*([^\\n]*)$"
+]
+
+[[tool.gitchangelog.sections]]
+name = "Features"
+regexps = [
+    "^feat\\s*:\\s*([^\\n]*)$",
+    "^feature\\s*:\\s*([^\\n]*)$"
+]
+
+[[tool.gitchangelog.sections]]
+name = "Bug Fixes"
+regexps = [
+    "^fix\\s*:\\s*([^\\n]*)$",
+    "^bug\\s*:\\s*([^\\n]*)$"
+]
+
+[[tool.gitchangelog.sections]]
+name = "Documentation"
+regexps = [
+    "^doc\\s*:\\s*([^\\n]*)$",
+    "^docs\\s*:\\s*([^\\n]*)$"
+]
+
+[[tool.gitchangelog.sections]]
+name = "Performance"
+regexps = [
+    "^perf\\s*:\\s*([^\\n]*)$",
+    "^performance\\s*:\\s*([^\\n]*)$"
+]
+
+[[tool.gitchangelog.sections]]
+name = "Refactoring"
+regexps = ["^refactor\\s*:\\s*([^\\n]*)$"]
+
+[[tool.gitchangelog.sections]]
+name = "Tests"
+regexps = [
+    "^test\\s*:\\s*([^\\n]*)$",
+    "^tests\\s*:\\s*([^\\n]*)$"
+]
+
+[[tool.gitchangelog.sections]]
+name = "Maintenance"
+regexps = [
+    "^chore\\s*:\\s*([^\\n]*)$",
+    "^maintain\\s*:\\s*([^\\n]*)$"
+]
+
+ignore_regexps = [
+    "@minor", "!minor",
+    "@cosmetic", "!cosmetic",
+    "@refactor", "!refactor",
+    "@wip", "!wip",
+    "^Merge pull request .*",
+    "^Merge branch .*",
+    "^Merge remote-tracking branch .*"
+]
+
+[tool.gitchangelog.replacements]
+"(?m)^\\s*([a-f0-9]{40})\\s*" = "([`\\1`](https://github.com/OWNER/REPO/commit/\\1))"
+
+[tool.gitchangelog.templates]
+header = """
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+"""
+
+release = """
+## [%(tag)s](https://github.com/OWNER/REPO/releases/tag/%(tag)s) (%(date)s)
+
+%(body)s
+"""
+
+[tool.gitchangelog.formatting]
+date_format = "%Y-%m-%d"
+message_template = "{subject} (by {author})"

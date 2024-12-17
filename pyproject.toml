@@ -28,6 +28,7 @@ dependencies = [
     "wheel>=0.45.1",
     "loguru>=0.7.2",
     "types-setuptools>=75.6.0.20241126",
+    "git-changelog>=2.5.3",
 ]
 
 [tool.uv]

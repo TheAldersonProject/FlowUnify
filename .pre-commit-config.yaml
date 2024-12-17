@@ -33,5 +33,5 @@ repos:
         entry: bash -c 'gitchangelog > CHANGELOG.md && git add CHANGELOG.md'
         language: system
         pass_filenames: false
-        stages: [ push ]
+        stages: [ pre-push ]
         branches: [ main,master ]

@@ -120,3 +120,5 @@ format = "markdown"
 output = "CHANGELOG.md"
 since = "HEAD~1"
 until = "HEAD"
+convention = "conventionalcommits"
+sections = ["Features", "Fixes", "Docs", "Tests"]

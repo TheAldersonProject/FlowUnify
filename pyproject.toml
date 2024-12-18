@@ -1,5 +1,5 @@
 [project]
-name = "YapLogger"
+name = "OpsDataFlow"
 authors = [
   { email = "thiago@thir.info" },
   { name = "Thiago Dias" }
@@ -29,6 +29,7 @@ dependencies = [
     "loguru>=0.7.2",
     "types-setuptools>=75.6.0.20241126",
     "git-changelog>=2.5.3",
+    "tomli>=2.2.1",
 ]
 
 [tool.uv]
@@ -39,10 +40,14 @@ dev-dependencies = [
     "ruff==0.7.1",
     "typos==1.26.8",
     "pre-commit>=4.0.1",
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.5.49",
+    "mkdocstrings>=0.27.0",
+    "readme-generator>=0.0.2",
 ]
 
 [tool.ruff]
-src = ["yaplogger"]
+src = ["src"]
 line-length = 120
 show-fixes = true
 unsafe-fixes = true
@@ -57,7 +62,7 @@ exclude = [
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["COM812", "ISC001", "TC001", "G002", "G004", "C408", "S101", "ERA001"]
+ignore = ["COM812", "ISC001", "G002", "G004", "C408", "S101", "ERA001"]
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -72,7 +77,7 @@ convention = "google"
 max-args = 10
 
 [tool.pyright]
-include = ["yaplogger"]
+include = ["src"]
 exclude = [
     "**/__pycache__",
     "**/tests",

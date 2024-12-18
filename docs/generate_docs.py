@@ -1,5 +1,5 @@
-# noqa: INP001
-# whoami: mkdocs.yml
+#!/usr/bin/env python3
+# whoami: docs/generate_docs.py
 """Documentation generator script for OpsDataFlow project."""
 
 import sys
@@ -15,7 +15,7 @@ README_TEMPLATE: Final[str] = """
 # OpsDataFlow
 
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-312/)
-[![License](https://img.shields.io/github/license/your-username/opsdataflow)](LICENSE)
+[![License](https://img.shields.io/github/license/TheAldersonProject/{repo_name})](LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Pyright](https://img.shields.io/badge/types-Pyright-brightgreen.svg)](https://github.com/microsoft/pyright)
@@ -30,44 +30,56 @@ README_TEMPLATE: Final[str] = """
 - Business outcome analysis support
 - Type-safe implementation with strict typing
 
-## 📦 Installation
+## 📦 Install & Configure
 
+### Clone the repository
 ```bash
-pip install opsdataflow
-🔧 Usage
+    git clone https://github.com/TheAldersonProject/{repo_name}.git
+    cd {repo_name}
+```
+
+### Use the Makefile options to install dependencies and configure the project
+```bash
+    make install
+```
+
+## 🔧 Usage
 Basic usage example:
 
-from opsdataflow import setup_logger
+```python
+from opsdataflow import tracker
 
-logger = setup_logger()
+tracker.start(**options)
+tracker.event("Here goes the final message")
+tracker.task("My task", "Task message")
+tracker.step("My step under my task", "Step message")
+```
 
-def your_workflow():
-    logger.info("Starting workflow")
-    # Your code here
-    logger.success("Workflow completed")
-🛠 Development
-This project uses:
-	•	black for code formatting
-	•	ruff for linting
-	•	pyright for static type checking
-	•	pytest for testing
-	•	pre-commit for git hooks
-To set up the development environment:
+## 🛠 Development
 
-# Clone the repository
-git clone https://github.com/your-username/opsdataflow.git
-cd opsdataflow
+### Requirements
+* Python {python_version}
+* [uv](https://github.com/astral-sh/uv) for dependency management
 
-# Create and activate virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\\Scripts\\activate
+### This project uses:
+* black for code formatting
+* ruff for linting
+* pyright for static type checking
+* pytest for testing
+* pre-commit for git hooks
 
-# Install dependencies with uv
-uv pip install --editable ".[dev]"
+## Project folders
+```
+{repo_name}/
+├── {source_dir}/     # Source code
+├── tests/            # Test files
+├── docs/             # Documentation
+├── Makefile         # Build automation
+└── pyproject.toml   # Project configuration
+```
 
-# Install pre-commit hooks
-pre-commit install
-📝 License
+# 📝 License
+
 This project is licensed under the terms specified in LICENSE file.
 """
 
@@ -99,33 +111,45 @@ def generate_readme(config: dict[str, Any]) -> None:
     """
     project_info = config.get("project", {})
     description = project_info.get("description", "")
+    python_version: str = project_info.get("requires-python", "")
 
-    readme_content = README_TEMPLATE.format(description=description)
+    readme_content = README_TEMPLATE.format(
+        repo_name="OpsDataFlow", source_dir="src", description=description, python_version=python_version
+    )
 
     with open("README.md", "w", encoding="utf-8") as f:  # noqa: PTH123
         f.write(readme_content.lstrip())
 
 
-def setup_mkdocs() -> None:
-    """Configure and generate MkDocs documentation."""
+def setup_mkdocs(construct_site: bool = False) -> None:  # noqa: FBT001, FBT002
+    """Configure and generate MkDocs documentation.
+
+    Args:
+        construct_site (bool): Defines either the helper site will be created or not.
+    """
     # Create docs directory if it doesn't exist
     docs_dir = Path("docs")
     docs_dir.mkdir(exist_ok=True)
 
     # Create basic documentation structure
-    api_dir = docs_dir / "api"
-    guides_dir = docs_dir / "guides"
-    examples_dir = docs_dir / "examples"
+    if construct_site:
+        api_dir = docs_dir / "api"
+        guides_dir = docs_dir / "guides"
+        examples_dir = docs_dir / "examples"
 
-    for directory in [api_dir, guides_dir, examples_dir]:
-        directory.mkdir(exist_ok=True)
+        for directory in [api_dir, guides_dir, examples_dir]:
+            directory.mkdir(exist_ok=True)
 
-    # Create index.md if it doesn't exist
-    index_path = docs_dir / "index.md"
-    if not index_path.exists():
-        with open(index_path, "w", encoding="utf-8") as f:  # noqa: PTH123
-            f.write("# Welcome to OpsDataFlow Documentation\n\n")
-            f.write("This is the documentation for the OpsDataFlow project.\n")
+        # Create index.md if it doesn't exist
+        index_path = docs_dir / "index.md"
+        if not index_path.exists():
+            with open(index_path, "w", encoding="utf-8") as f:  # noqa: PTH123
+                f.write("# Welcome to OpsDataFlow Documentation\n\n")
+                f.write("This is the documentation for the OpsDataFlow project.\n")
+
+            # Build MkDocs documentation
+            mkdocs_config = load_config()
+            build(mkdocs_config)
 
 
 def main() -> int:
@@ -135,13 +159,11 @@ def main() -> int:
         int: Exit code (0 for success, 1 for failure)
     """
     try:
+        logger.info("Generating documentation...")
         config = read_pyproject_toml()
+        logger.info(f"Config file: {config}")
         generate_readme(config)
-        setup_mkdocs()
-
-        # Build MkDocs documentation
-        mkdocs_config = load_config()
-        build(mkdocs_config)
+        setup_mkdocs(construct_site=False)
 
         logger.info("Documentation generated successfully!")
 
@@ -153,5 +175,6 @@ def main() -> int:
         return 0
 
 
-if __name__ == "main":
-    sys.exit(main())
+# if __name__ == "main":
+logger.info("Starting docs generation.")
+sys.exit(main())

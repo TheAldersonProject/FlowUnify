@@ -6,11 +6,7 @@ authors = [
 ]
 version = "0.1.3"
 description = """
-This project aims to provide a centralized logging solution for projects with multiple steps and workflows.
-
-It facilitates tracing by identifying processes throughout their execution using a unique execution ID.
-Logging during the process should help the engineering team debug issues.
-Additionally, it is crucial for ensuring business outcomes by analyzing system behavior.
+This project aims to provide a centralized ease of use point for governing data platforms processes.
 """
 readme = "README.md"
 license = { file = "LICENSE" }

@@ -6,11 +6,7 @@
 [![Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Pyright](https://img.shields.io/badge/types-Pyright-brightgreen.svg)](https://github.com/microsoft/pyright)
 
-This project aims to provide a centralized logging solution for projects with multiple steps and workflows.
-
-It facilitates tracing by identifying processes throughout their execution using a unique execution ID.
-Logging during the process should help the engineering team debug issues.
-Additionally, it is crucial for ensuring business outcomes by analyzing system behavior.
+This project aims to provide a centralized ease of use point for governing data platforms processes.
 
 
 ## 🚀 Features

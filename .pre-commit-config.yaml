@@ -35,12 +35,3 @@ repos:
         language: system
         pass_filenames: false
         stages: [pre-push]
-
-  - repo: local
-    hooks:
-      - id: generate-docs
-        name: Generate Documentation
-        entry: uv run python docs/generate_docs.py
-        language: python
-        pass_filenames: false
-

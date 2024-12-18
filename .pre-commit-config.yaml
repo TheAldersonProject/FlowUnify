@@ -34,7 +34,7 @@ repos:
         entry: bash -c 'echo "Generating changelog..." && uv pip install git-changelog && uv run gitchangelog > CHANGELOG.md && git add CHANGELOG.md || echo "Failed to generate changelog"'
         language: system
         pass_filenames: false
-        stages: [push]
+        stages: [pre-push]
 
   - repo: local
     hooks:

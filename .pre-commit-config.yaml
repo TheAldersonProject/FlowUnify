@@ -40,7 +40,7 @@ repos:
     hooks:
       - id: generate-docs
         name: Generate Documentation
-        entry: uv run python docs/generate_docs.py
+        entry: bash -c 'uv run python docs/generate_docs.py'
         language: python
         pass_filenames: false
 

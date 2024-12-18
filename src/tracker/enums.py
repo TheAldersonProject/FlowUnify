@@ -1,4 +1,4 @@
-# whoami: src/event_track/enums.py
+# whoami: src/tracker/enums.py
 """Collection of Enum classes to be used for YapLogger."""
 
 from enum import IntEnum

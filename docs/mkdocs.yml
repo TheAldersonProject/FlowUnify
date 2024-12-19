@@ -1,0 +1,42 @@
+site_name: OpsDataFlow
+site_description: Centralized logging solution for projects with multiple steps and workflows
+theme:
+  name: material
+  palette:
+    primary: blue
+    accent: light blue
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - search.suggest
+    - search.highlight
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [opsdataflow]
+          options:
+            show_source: true
+            show_root_heading: true
+            show_category_heading: true
+            show_submodules: true
+
+nav:
+  - Home: index.md
+  - API Reference:
+    - api/reference.md
+  - User Guide:
+    - guides/getting-started.md
+  - Examples:
+    - examples/basic-usage.md
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - admonition
+  - toc:
+      permalink: true

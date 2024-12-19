@@ -1,0 +1,202 @@
+[project]
+name = "OpsDataFlow"
+authors = [
+  { email = "thiago@thir.info" },
+  { name = "Thiago Dias" }
+]
+version = "v0.1.1"
+description = """
+This project aims to create a centralized hub for managing data platform processes.
+"""
+readme = "README.md"
+license = { file = "LICENSE" }
+classifiers = [
+    "Programming Language :: Python",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.12",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Typing :: Typed",
+]
+requires-python = ">=3.12"
+dependencies = [
+    "loguru>=0.7.2",
+    "tomli>=2.2.1",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "black==24.10.0",
+    "pyright>=1.1.388",
+    "pytest==8.3.3",
+    "ruff==0.7.1",
+    "typos==1.26.8",
+    "pre-commit>=4.0.1",
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.5.49",
+    "mkdocstrings>=0.27.0",
+    "readme-generator>=0.0.2",
+    "git-changelog>=2.5.3",
+]
+
+[tool.ruff]
+src = ["opsdataflow"]
+line-length = 120
+show-fixes = true
+unsafe-fixes = true
+exclude = [
+    "**/__pycache__",
+    "**/tests",
+    "./examples/**/*",
+    "./typings",
+    "./setup.py",
+    "/**/decorators.py"
+]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["COM812", "ISC001", "G002", "G004", "C408", "S101", "ERA001"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint.pycodestyle]
+max-doc-length = 120
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.pylint]
+max-args = 10
+
+[tool.pyright]
+include = ["opsdataflow"]
+exclude = [
+    "**/__pycache__",
+    "**/tests",
+    "./examples/**/*",
+    "./typings",
+    "./setup.py",
+    "/**/decorators.py"
+]
+typeCheckingMode = "strict"
+reportMissingTypeStubs = true
+reportUnknownParameterType = true
+reportUnknownArgumentType = true
+reportUnknownLambdaType = true
+reportUnknownVariableType = true
+reportUnknownMemberType = true
+reportMissingTypeArgument = true
+reportInvalidTypeVarUse = true
+reportUnnecessaryCast = true
+reportUnnecessaryComparison = true
+reportUnnecessaryContains = true
+reportCallInDefaultInitializer = true
+reportPropertyTypeMismatch = true
+reportWildcardImportFromLibrary = true
+reportUntypedFunctionDecorator = true
+reportUntypedClassDecorator = true
+reportUntypedBaseClass = true
+useLibraryCodeForTypes = true
+venvPath = "."
+venv = ".venv"
+applyFixes = true
+
+[tool.black]
+line-length = 120
+target-version = ['py312']
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+split-on-trailing-comma = true
+relative-imports-order = "closest-to-furthest"
+force-single-line = false
+force-wrap-aliases = false
+
+[tool.gitchangelog]
+output_file = "CHANGELOG.md"
+tag_filter_regexp = "^v[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
+
+[[tool.gitchangelog.sections]]
+name = "Breaking Changes"
+regexps = [
+    "^break\\s*:\\s*([^\\n]*)$",
+    "^breaking\\s*:\\s*([^\\n]*)$"
+]
+
+[[tool.gitchangelog.sections]]
+name = "Features"
+regexps = [
+    "^feat\\s*:\\s*([^\\n]*)$",
+    "^feature\\s*:\\s*([^\\n]*)$"
+]
+
+[[tool.gitchangelog.sections]]
+name = "Bug Fixes"
+regexps = [
+    "^fix\\s*:\\s*([^\\n]*)$",
+    "^bug\\s*:\\s*([^\\n]*)$"
+]
+
+[[tool.gitchangelog.sections]]
+name = "Documentation"
+regexps = [
+    "^doc\\s*:\\s*([^\\n]*)$",
+    "^docs\\s*:\\s*([^\\n]*)$"
+]
+
+[[tool.gitchangelog.sections]]
+name = "Performance"
+regexps = [
+    "^perf\\s*:\\s*([^\\n]*)$",
+    "^performance\\s*:\\s*([^\\n]*)$"
+]
+
+[[tool.gitchangelog.sections]]
+name = "Refactoring"
+regexps = ["^refactor\\s*:\\s*([^\\n]*)$"]
+
+[[tool.gitchangelog.sections]]
+name = "Tests"
+regexps = [
+    "^test\\s*:\\s*([^\\n]*)$",
+    "^tests\\s*:\\s*([^\\n]*)$"
+]
+
+[[tool.gitchangelog.sections]]
+name = "All Changes"
+regexps = ["^.*$"]  # This will match everything
+
+
+ignore_regexps = [
+    "@minor", "!minor",
+    "@cosmetic", "!cosmetic",
+    "@refactor", "!refactor",
+    "@wip", "!wip",
+    "^Merge pull request .*",
+    "^Merge branch .*",
+    "^Merge remote-tracking branch .*"
+]
+
+[tool.gitchangelog.replacements]
+"(?m)^\\s*([a-f0-9]{40})\\s*" = "([`\\1`](https://github.com/OWNER/REPO/commit/\\1))"
+
+[tool.gitchangelog.templates]
+header = """
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+"""
+
+release = """
+## [%(tag)s](https://github.com/OWNER/REPO/releases/tag/%(tag)s) (%(date)s)
+
+%(body)s
+"""
+
+[tool.gitchangelog.formatting]
+date_format = "%Y-%m-%d"
+message_template = "{subject} (by {author})"

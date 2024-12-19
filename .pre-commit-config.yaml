@@ -25,13 +25,3 @@ repos:
     rev: typos-dict-v0.11.37
     hooks:
       - id: typos
-
-  - repo: local
-    hooks:
-      - id: generate-changelog
-        name: Generate Changelog
-        # Use uv to run the command
-        entry: bash -c 'echo "Generating changelog..." && uv pip install git-changelog && uv run gitchangelog > CHANGELOG.md && git add CHANGELOG.md || echo "Failed to generate changelog"'
-        language: system
-        pass_filenames: false
-        stages: [pre-push]

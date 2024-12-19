@@ -26,7 +26,7 @@ TEST_DIR = ./tests
 TEST_PY_FILES = $(TEST_DIR)/*.py
 
 # Phony targets
-.PHONY: help install format lint test clean build
+.PHONY: help install format lint test clean build version
 
 # Default target
 help:
@@ -36,6 +36,7 @@ help:
 	@echo "  make lint       : Run linters"
 	@echo "  make test       : Run tests"
 	@echo "  make clean      : Remove build artifacts"
+	@echo "  make version    : Pre-build. Clean, run git-changelog, generate_docs.py."
 	@echo "  make build      : Runs all above to deploy"
 
 # Install dependencies
@@ -68,6 +69,28 @@ clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
 	rm -rf .pytest_cache
+
+
+# Run the phony as below
+version:
+	@echo "Clean project files"
+	make clean
+
+	@echo "Format project files"
+	make format
+
+	@echo "Check project lint"
+	make lint
+
+	@echo "Run tests"
+	#make test
+
+	@echo "Changelog"
+	uv run git-changelog --config-file pyproject.toml -o CHANGELOG.md
+
+	@echo "README.md"
+	uv run python ./docs/generate_docs.py
+
 
 # Run the phony as below
 build:

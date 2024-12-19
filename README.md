@@ -6,7 +6,7 @@
 [![Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Pyright](https://img.shields.io/badge/types-Pyright-brightgreen.svg)](https://github.com/microsoft/pyright)
 
-This project aims to provide a centralized ease of use point for governing data platforms processes.
+This project aims to create a centralized hub for managing data platform processes.
 
 
 ## 🚀 Features
@@ -58,7 +58,7 @@ tracker.step("My step under my task", "Step message")
 ## Project folders
 ```
 OpsDataFlow/
-├── src/     # Source code
+├── opsdataflow/     # Source code
 ├── tests/            # Test files
 ├── docs/             # Documentation
 ├── Makefile         # Build automation

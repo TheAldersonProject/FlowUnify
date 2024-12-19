@@ -43,7 +43,7 @@ dev-dependencies = [
 ]
 
 [tool.ruff]
-src = ["src"]
+src = ["opsdataflow"]
 line-length = 120
 show-fixes = true
 unsafe-fixes = true
@@ -73,7 +73,7 @@ convention = "google"
 max-args = 10
 
 [tool.pyright]
-include = ["src"]
+include = ["opsdataflow"]
 exclude = [
     "**/__pycache__",
     "**/tests",

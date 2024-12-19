@@ -114,7 +114,7 @@ def generate_readme(config: dict[str, Any]) -> None:
     python_version: str = project_info.get("requires-python", "")
 
     readme_content = README_TEMPLATE.format(
-        repo_name="OpsDataFlow", source_dir="src", description=description, python_version=python_version
+        repo_name="OpsDataFlow", source_dir="opsdataflow", description=description, python_version=python_version
     )
 
     with open("README.md", "w", encoding="utf-8") as f:  # noqa: PTH123

@@ -17,7 +17,7 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          paths: [src]
+          paths: [opsdataflow]
           options:
             show_source: true
             show_root_heading: true

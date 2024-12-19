@@ -12,14 +12,14 @@ BLACK_ARGS = --config ./pyproject.toml
 
 # RUFF
 RUFF = ruff --config ./pyproject.toml
-RUFF_ARGS = --target-version py$(PYTHON_VERSION) -n
+RUFF_ARGS = --target-version py312 -n
 
 # PYRIGHT
 PYRIGHT = pyright
 PYRIGHT_LINT_ARGS = --project pyproject.toml --pythonversion $(UV_PY_INSTALL_VERSION) --stats
 
 # PROJECT
-SOURCE_DIR = ./yaplogger
+SOURCE_DIR = ./opsdataflow
 SOURCE_PY_FILES = $(SOURCE_DIR)/**/*.py
 
 TEST_DIR = ./tests
@@ -84,4 +84,4 @@ build:
 	make test
 
 	@echo "Building wheel"
-	uv pip install .
+	#uv pip install .

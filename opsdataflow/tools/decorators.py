@@ -1,4 +1,4 @@
-#whoami: src/ops_data_flow/utils/decorators.py
+# whoami: src/ops_data_flow/utils/decorators.py
 """OpsDataFlow Decorators."""
 
 import threading
@@ -10,6 +10,7 @@ T = TypeVar("T")  # Type variable to maintain type hints
 P = ParamSpec("P")
 
 _lock = threading.RLock()  # lock to ensure thread safety
+
 
 def singleton(cls: type[T]) -> Callable[..., T]:
     """Create and maintain a single instance of an object.

@@ -5,8 +5,8 @@ from enum import IntEnum
 from typing import NamedTuple
 
 
-class EventLevel(NamedTuple):
-    """Defines a named tuple EventLevel for categorizing event levels."""
+class Level(NamedTuple):
+    """Defines a named tuple EventLevel for categorizing levels."""
 
     name: str
     value: int
@@ -43,9 +43,9 @@ class LoggerSeverityLevel(IntEnum):
         """Overwrites the __str__ method to retrieve the name.title() of the severity level."""
         return self.name.title()
 
-    def as_tuple(self) -> EventLevel:
+    def as_tuple(self) -> Level:
         """Retrieves the log level name and value as a NamedTuple."""
-        return EventLevel(self.name, self.value)
+        return Level(self.name, self.value)
 
 
 class TrackerSeverityLevel(IntEnum):
@@ -77,6 +77,6 @@ class TrackerSeverityLevel(IntEnum):
         """Overwrites the __str__ method to retrieve the name.title() of the severity level."""
         return self.name.title()
 
-    def as_tuple(self) -> EventLevel:
+    def as_tuple(self) -> Level:
         """Retrieves the log level name and value as a NamedTuple."""
-        return EventLevel(self.name, self.value)
+        return Level(self.name, self.value)

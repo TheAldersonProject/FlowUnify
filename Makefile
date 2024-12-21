@@ -1,4 +1,10 @@
-# ./Makefile
+# Environment variables
+SHELL := /bin/bash
+.DEFAULT_GOAL := help
+
+define format_py_version
+$(shell echo "py$(subst .,,$(1))")
+endef
 
 # PYTHON
 PYTHON_VERSION := $(shell cat .python-version)
@@ -7,104 +13,94 @@ UV_PY_INSTALL_VERSION = $(PYTHON_VERSION)
 UV_PY_VERSION = --python $(UV_PY_INSTALL_VERSION)
 UV_ENV_ARGS = --allow-existing
 
-# BLACK
-BLACK_ARGS = --config ./pyproject.toml
-
-# RUFF
-RUFF = ruff --config ./pyproject.toml
-RUFF_ARGS = --target-version py312 -n
-
-# PYRIGHT
-PYRIGHT = pyright
-PYRIGHT_LINT_ARGS = --project pyproject.toml --pythonversion $(UV_PY_INSTALL_VERSION) --stats
-
 # PROJECT
 SOURCE_DIR = ./opsdataflow
-SOURCE_PY_FILES = $(SOURCE_DIR)/**/*.py
-
 TEST_DIR = ./tests
-TEST_PY_FILES = $(TEST_DIR)/*.py
+DOCS_DIR = ./docs
+CONFIG_FILE = pyproject.toml
 
-# Phony targets
-.PHONY: help install format lint test clean build version
+# TOOLS
+BLACK_ARGS = --config $(CONFIG_FILE)
+RUFF = ruff --config $(CONFIG_FILE)
+#RUFF_ARGS = --target-version py312 -n
+RUFF_ARGS = --target-version $(call format_py_version,$(UV_PY_INSTALL_VERSION)) -n
+PYRIGHT = pyright
+PYRIGHT_ARGS = --project $(CONFIG_FILE) --pythonversion $(UV_PY_INSTALL_VERSION) --stats
+PYTEST_ARGS = --cov=$(SOURCE_DIR) --cov-report=xml --cov-report=term-missing
 
-# Default target
+# Colors for terminal output
+BLUE := \033[0;34m
+NC := \033[0m # No Color
+INFO := @echo "[INFO]"
+
+.PHONY: help install dev-install format lint test clean build version check docs
+
 help:
-	@echo "Available commands:"
-	@echo "  make install    : Install dependencies"
-	@echo "  make format     : Format code using Black and isort"
-	@echo "  make lint       : Run linters"
-	@echo "  make test       : Run tests"
-	@echo "  make clean      : Remove build artifacts"
-	@echo "  make version    : Pre-build. Clean, run git-changelog, generate_docs.py."
-	@echo "  make build      : Runs all above to deploy"
+	@echo "🚀 OpsDataFlow Development Commands"
+	@echo ""
+	@echo "Development:"
+	@echo "  make install      : Clean install of dependencies"
+	@echo "  make dev-install  : Install development dependencies"
+	@echo "  make format       : Format code using Black and Ruff"
+	@echo "  make lint         : Run all linters"
+	@echo "  make test         : Run tests with coverage"
+	@echo "  make check        : Run format, lint, and test"
+	@echo ""
+	@echo "Documentation:"
+	@echo "  make docs         : Generate documentation"
+	@echo ""
+	@echo "Deployment:"
+	@echo "  make clean        : Remove build artifacts"
+	@echo "  make version      : Update version and changelog"
+	@echo "  make build        : Build package"
 
-# Install dependencies
 install:
+	${INFO} "Installing dependencies..."
 	rm -rf .venv
 	python3 -m pip install --upgrade pip
 	python3 -m pip install uv
 	uv python install $(UV_PY_INSTALL_VERSION)
 	uv venv $(UV_PY_VERSION) $(UV_ENV_ARGS)
 	uv sync
+
+dev-install: install
+	${INFO} "Installing development dependencies..."
 	uv run pre-commit install
+	uv pip install -e ".[dev]"
 
-# Format code
 format:
-	uv run black $(SOURCE_DIR) $(BLACK_ARGS)
-	uv run $(RUFF) format $(SOURCE_DIR) $(RUFF_ARGS)
+	${INFO} "Formatting code..."
+	uv run black $(SOURCE_DIR) $(TEST_DIR) $(BLACK_ARGS)
+	uv run $(RUFF) format $(SOURCE_DIR) $(TEST_DIR) $(RUFF_ARGS)
 
-# Lint code
 lint:
-	uv run black --check $(SOURCE_DIR) $(BLACK_ARGS)
-	uv run $(RUFF) check $(SOURCE_DIR) $(RUFF_ARGS) --fix
-	uv run $(PYRIGHT) $(SOURCE_DIR) $(PYRIGHT_LINT_ARGS)
+	${INFO} "Linting code..."
+	uv run black --check $(SOURCE_DIR) $(TEST_DIR) $(BLACK_ARGS)
+	uv run $(RUFF) check $(SOURCE_DIR) $(TEST_DIR) $(RUFF_ARGS) --fix
+	uv run $(PYRIGHT) $(SOURCE_DIR) $(PYRIGHT_ARGS)
 
-# Run tests
 test:
-	uv run python3 -m pytest $(TEST_DIR)
+	${INFO} "Running tests..."
+	uv run pytest $(TEST_DIR) $(PYTEST_ARGS)
 
-# Clean build artifacts
+check: format lint test
+
 clean:
+	${INFO} "Cleaning project..."
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
-	rm -rf .pytest_cache
+	rm -rf .pytest_cache build dist *.egg-info .coverage coverage.xml
 
-
-# Run the phony as below
-version:
-	@echo "Clean project files"
-	make clean
-
-	@echo "Format project files"
-	make format
-
-	@echo "Check project lint"
-	make lint
-
-	@echo "Run tests"
-	#make test
-
-	@echo "Changelog"
-	uv run git-changelog --config-file pyproject.toml -o CHANGELOG.md
-
-	@echo "README.md"
+docs:
+	${INFO} "Generating documentation..."
+	uv run mkdocs build --strict
 	uv run python ./docs/generate_docs.py
 
+version: check
+	${INFO} "Updating version and changelog..."
+	uv run git-changelog --config-file $(CONFIG_FILE) -o CHANGELOG.md
 
-# Run the phony as below
-build:
-	@echo "Clean project files"
-	make clean
-
-	@echo "Format project files"
-	make format
-
-	@echo "Check project lint"
-	make lint
-
-	@echo "Run tests"
-	make test
-
-	@echo "Building wheel"
-	#uv pip install .
+build: check
+	${INFO} "Building package..."
+	uv pip install build
+	uv run python -m build

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# whoami: docs/generate_docs.py
 """Documentation generator script for OpsDataFlow project."""
 
 import sys

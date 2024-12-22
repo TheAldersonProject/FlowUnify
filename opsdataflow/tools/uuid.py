@@ -1,4 +1,3 @@
-# whoami: opsdataflow/tools/uuid.py
 """UUID Generator and management."""
 
 import uuid

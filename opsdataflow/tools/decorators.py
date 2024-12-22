@@ -1,4 +1,3 @@
-# whoami: opsdataflow/tools/decorators.py
 """OpsDataFlow Decorators."""
 
 import threading

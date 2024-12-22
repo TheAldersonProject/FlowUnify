@@ -1,4 +1,3 @@
-# whoami: opsdataflow/tools/string_ops.py
 """Tools for working with strings."""
 
 

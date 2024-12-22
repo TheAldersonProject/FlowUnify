@@ -1,8 +1,8 @@
 from typing import Any
 
 from loguru import logger
-from opsdataflow.tracker.enums import Handler
-from opsdataflow.tracker.handler_configuration import HandlerConfiguration
+from opsdataflow.track_flow.enums import Handler
+from opsdataflow.track_flow.handler_configuration import HandlerConfiguration
 
 # using default values
 parameters: dict[str, Any] = HandlerConfiguration(Handler.LOGGER).configure()

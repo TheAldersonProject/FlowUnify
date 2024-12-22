@@ -1,6 +1,5 @@
-# whoami: opsdataflow/tracker/__init__.py
-"""Package contains Tracker library tools and functionalities."""
+"""Tracker library tools and functionalities."""
 
-from opsdataflow.tracker.enums import TrackerSeverityLevel
+from opsdataflow.tracker.logger_handler import LoggerHandler
 
-__all__ = ["TrackerSeverityLevel"]
+__all__ = ["LoggerHandler"]

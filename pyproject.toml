@@ -21,6 +21,7 @@ classifiers = [
 requires-python = ">=3.12"
 dependencies = [
     "loguru>=0.7.2",
+    "pydantic>=2.10.4",
     "tomli>=2.2.1",
 ]
 
@@ -55,7 +56,7 @@ exclude = [
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["COM812", "ISC001", "G002", "G004", "C408", "S101", "ERA001"]
+ignore = ["COM812", "ISC001", "G002", "G004", "C408", "S101", "ERA001", "ANN401"]
 
 [tool.ruff.format]
 docstring-code-format = true

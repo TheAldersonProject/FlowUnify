@@ -1,5 +1,4 @@
-# whoami: opsdataflow/tracker/enums.py
-"""This file contains a NamedTuple definition representing the level of an event."""
+"""Tracker project common enums."""
 
 from enum import IntEnum
 from typing import NamedTuple
@@ -12,7 +11,7 @@ class Level(NamedTuple):
     value: int
 
 
-class LoggerSeverityLevel(IntEnum):
+class LoggerLevel(IntEnum):
     """Enumeration for Logger Severity Levels.
 
     This enumeration defines various levels of logging severity to classify log
@@ -24,7 +23,6 @@ class LoggerSeverityLevel(IntEnum):
     - TRACE: Provides the most detailed information, useful during development and debugging.
     - DEBUG: Captures diagnostic information needed to analyze the code's behavior or state.
     - INFO: Represents general informational messages about system operations.
-    - SUCCESS: Indicates successful completion of operations or specific tasks.
     - WARNING: Highlights potential issues that could escalate into errors but does not affect
       current functionality.
     - ERROR: Refers to recoverable errors that may lead to incorrect application behavior.
@@ -34,7 +32,6 @@ class LoggerSeverityLevel(IntEnum):
     TRACE = 5  # Detailed information for debugging
     DEBUG = 10  # Diagnostic information
     INFO = 20  # General operational information
-    SUCCESS = 25  # Successful completion of operations
     WARNING = 30  # Potential issues that don't affect core functionality
     ERROR = 40  # Recoverable errors that affect functionality
     CRITICAL = 50  # Unrecoverable errors that require immediate attention
@@ -48,7 +45,7 @@ class LoggerSeverityLevel(IntEnum):
         return Level(self.name, self.value)
 
 
-class TrackerSeverityLevel(IntEnum):
+class TrackerLevel(IntEnum):
     """TrackerSeverityLevel Enumeration.
 
     Defines various severity levels for tracking events in an application. These severity levels are grouped
@@ -80,3 +77,19 @@ class TrackerSeverityLevel(IntEnum):
     def as_tuple(self) -> Level:
         """Retrieves the log level name and value as a NamedTuple."""
         return Level(self.name, self.value)
+
+
+class Handler(IntEnum):
+    """Enumeration to define different handler types.
+
+    Defines integer values associated with specific handlers like LOGGER and TRACKER. This class inherits from IntEnum,
+    allowing for enumeration of integer constants. It can be used to represent and manipulate handler types in a more
+    readable and descriptive way.
+    """
+
+    LOGGER = 1
+    TRACKER = 2
+
+    def __str__(self) -> str:
+        """Overwrites the __str__ method to retrieve the name.title() of the severity level."""
+        return self.name.title()

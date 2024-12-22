@@ -1,5 +1,6 @@
 """Logger handler."""
 
+import asyncio
 import sys
 from datetime import UTC, datetime
 from typing import Any
@@ -77,7 +78,7 @@ class LoggerHandler:
             **kwargs,
         )
 
-    def _log(self, level: LoggerLevel, message: str, **kwargs: Any) -> None:
+    async def __log(self, level: LoggerLevel, message: str, **kwargs: Any) -> None:
         """Unique point to apply changes and log."""
         now_utc: str = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
@@ -93,24 +94,24 @@ class LoggerHandler:
 
     def trace(self, message: str, **kwargs: Any) -> None:
         """Encapsulated trace method with automatic UID inclusion."""
-        self._log(LoggerLevel.TRACE, message, **kwargs)
+        asyncio.run(self.__log(LoggerLevel.TRACE, message, **kwargs))
 
     def debug(self, message: str, **kwargs: Any) -> None:
         """Encapsulated debug method with automatic UID inclusion."""
-        self._log(LoggerLevel.DEBUG, message, **kwargs)
+        asyncio.run(self.__log(LoggerLevel.DEBUG, message, **kwargs))
 
     def info(self, message: str, **kwargs: Any) -> None:
         """Encapsulated info method with automatic UID inclusion."""
-        self._log(LoggerLevel.INFO, message, **kwargs)
+        asyncio.run(self.__log(LoggerLevel.INFO, message, **kwargs))
 
     def warning(self, message: str, **kwargs: Any) -> None:
         """Encapsulated warning method with automatic UID inclusion."""
-        self._log(LoggerLevel.WARNING, message, **kwargs)
+        asyncio.run(self.__log(LoggerLevel.WARNING, message, **kwargs))
 
     def error(self, message: str, **kwargs: Any) -> None:
         """Encapsulated error method with automatic UID inclusion."""
-        self._log(LoggerLevel.ERROR, message, **kwargs)
+        asyncio.run(self.__log(LoggerLevel.ERROR, message, **kwargs))
 
     def critical(self, message: str, exc_info: str | Exception | None = None, **kwargs: Any) -> None:
         """Encapsulated critical method with automatic UID inclusion."""
-        self._log(LoggerLevel.CRITICAL, message, exc_info=exc_info, **kwargs)
+        asyncio.run(self.__log(LoggerLevel.CRITICAL, message, exc_info=exc_info, **kwargs))

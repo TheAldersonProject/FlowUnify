@@ -4,7 +4,7 @@ tracker_sink_format: str = (
     "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>"
     " | <level>{level: <8}</level>"
     " | <level>{message}</level>"
-    " | <level>Extra: {extra}</level>"
+    # " | <level>Extra: {extra}</level>"
 )
 tracker = Tracker(tracker_sink_format=tracker_sink_format)
 tracker.process(
@@ -29,7 +29,6 @@ tracker.end_process()
 tracker.event("I am an event in the middle of a messaging war.")
 tracker.warning("Life without a warning.")
 tracker.error("You've got error.")
-tracker.critical("Panic!")
 tracker.end_process()
 tracker = Tracker()
 tracker.trace("1 - Hello World Trace!")
@@ -37,7 +36,6 @@ tracker.debug("2 - Hello World Debug!")
 tracker.info("3 - Hello World Info!")
 tracker.warning("4 - Hello World Warning!")
 tracker.error("5 - Hello World Error!")
-tracker.critical("6 - Hello World Critical!")
 
 # tracker.end_step()
 # tracker.event("Back to task")

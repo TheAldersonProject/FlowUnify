@@ -16,6 +16,7 @@ tracker.step(
 tracker.event("I am an event of a task type.")
 tracker.end_step()
 tracker.event("Back to task")
+tracker.process()
 tracker.step()
 tracker.event("I am a new kid step")
 tracker.end_task()

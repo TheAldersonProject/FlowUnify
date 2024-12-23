@@ -2,16 +2,16 @@ from opsdataflow.track_flow.tracker import Tracker
 
 tracker = Tracker()
 tracker.process(
-    process_name="I am a process. My name is ProcessMe.",
-    process_description="My description",
-    process_parent_uuid="123"
+    name="I am a process. My name is ProcessMe.",
+    description="My description",
+    parent_uuid="123"
 )
 tracker.event("I am an event.")
 tracker.task()
 tracker.event("I am an event of a task type.")
 tracker.step(
-    step_name="I am a step. My name is StepMe.",
-    step_description="My description",
+    name="I am a step. My name is StepMe.",
+    description="My description",
     step_parent_uuid="123")
 tracker.event("I am an event of a task type.")
 tracker.end_step()

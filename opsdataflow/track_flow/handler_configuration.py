@@ -31,8 +31,8 @@ class HandlerConfiguration:
         """
         self._configuration: dict[str, Any] = deepcopy(Constants.DEFAULT_CONFIGURATIONS[handler])
 
-    def configure(self, **kwargs: Any) -> dict[str, Any]:
-        """Configures the handler with the provided settings.
+    def build(self, **kwargs: Any) -> dict[str, Any]:
+        """Builds the handler with the provided settings.
 
         This method accepts dynamic keyword arguments to configure a handler instance. It validates the provided keys
         against a predefined configuration dictionary.

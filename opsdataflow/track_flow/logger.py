@@ -5,8 +5,10 @@ import sys
 from typing import Any
 
 from opsdataflow.tools.decorators import singleton
+from opsdataflow.tools.uuid import generate_uuid4
 from opsdataflow.track_flow.constants import Constants
-from opsdataflow.track_flow.enums import LoggerLevel
+from opsdataflow.track_flow.enums import Handler, LoggerLevel
+from opsdataflow.track_flow.handler_configuration import HandlerConfiguration
 from opsdataflow.track_flow.track_handler import Track
 
 
@@ -22,7 +24,12 @@ class Logger(Track):
 
     def __init__(self, **kwargs: Any) -> None:
         """Logger class init method."""
-        super().__init__(**kwargs)
+        self.__parameters: dict[str, Any] = HandlerConfiguration(Handler.LOGGER).build(**kwargs)
+        super().__init__(
+            handler=Handler.LOGGER,
+            handler_uuid=self.__parameters.get(Constants.HANDLER_UUID_KEY, generate_uuid4()),
+            **kwargs,
+        )
         self.__sink_basic_configuration()
 
     def __sink_basic_configuration(self, **kwargs: Any) -> None:
@@ -31,7 +38,7 @@ class Logger(Track):
         super().reporter.add(
             sink=sys.stdout,
             level=LoggerLevel.TRACE.value,
-            format=self.parameters[Constants.LOGGER_SINK_FORMAT_KEY],
+            format=self.__parameters[Constants.LOGGER_SINK_FORMAT_KEY],
             filter=None,
             colorize=True,
             serialize=False,

@@ -193,27 +193,27 @@ class Tracker(Track):
 
     def process(
         self,
-        process_name: str | None = None,
-        process_description: str | None = None,
-        process_parent_uuid: str | None = None,
+        name: str | None = None,
+        description: str | None = None,
+        parent_uuid: str | None = None,
         **kwargs: Any,
     ) -> None:
         """Starts the process tracking group."""
         self.__start_group(
             group=TrackerGroup.PROCESS,
-            name=process_name,
-            description=process_description,
-            parent_uuid=process_parent_uuid,
+            name=name,
+            description=description,
+            parent_uuid=parent_uuid,
             **kwargs,
         )
 
-    def task(self, task_name: str | None = None, task_description: str | None = None, **kwargs: Any) -> None:
+    def task(self, name: str | None = None, description: str | None = None, **kwargs: Any) -> None:
         """Starts the task tracking group."""
-        self.__start_group(group=TrackerGroup.TASK, name=task_name, description=task_description, **kwargs)
+        self.__start_group(group=TrackerGroup.TASK, name=name, description=description, **kwargs)
 
-    def step(self, step_name: str | None = None, step_description: str | None = None, **kwargs: Any) -> None:
+    def step(self, name: str | None = None, description: str | None = None, **kwargs: Any) -> None:
         """Starts the step tracking group."""
-        self.__start_group(group=TrackerGroup.STEP, name=step_name, description=step_description, **kwargs)
+        self.__start_group(group=TrackerGroup.STEP, name=name, description=description, **kwargs)
 
     def end_step(self) -> None:
         """Ends the step tracking group."""

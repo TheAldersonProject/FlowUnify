@@ -39,13 +39,13 @@ class Constants:
 
     # tracker keys
     TRACKER_SINK_FORMAT_KEY: str = "tracker_sink_format"
-    TRACKER_EXTRA_KEY: str = "tracker_extra"
-    TRACKER_PROCESS_NAME_KEY: str = "tracker_process_name"
-    TRACKER_PROCESS_DESCRIPTION_KEY: str = "tracker_process_description"
-    TRACKER_TASK_NAME_KEY: str = "tracker_task_name"
-    TRACKER_TASK_DESCRIPTION_KEY: str = "tracker_task_description"
-    TRACKER_STEP_NAME_KEY: str = "tracker_step_name"
-    TRACKER_STEP_DESCRIPTION_KEY: str = "tracker_step_description"
+    TRACKER_EXTRA_KEY: str = "extra"
+    TRACKER_PROCESS_NAME_KEY: str = "process_name"
+    TRACKER_PROCESS_DESCRIPTION_KEY: str = "process_description"
+    TRACKER_TASK_NAME_KEY: str = "task_name"
+    TRACKER_TASK_DESCRIPTION_KEY: str = "task_description"
+    TRACKER_STEP_NAME_KEY: str = "step_name"
+    TRACKER_STEP_DESCRIPTION_KEY: str = "step_description"
 
     # tracker default values
     TRACKER_DEFAULT_PROCESS_NAME: str = "Process name not informed"

@@ -37,10 +37,35 @@ class Constants:
     LOGGER_SINK_FORMAT_KEY: str = "logger_sink_format"
     LOGGER_EXTRA_KEY: str = "logger_extra"
 
+    # tracker keys
+    TRACKER_SINK_FORMAT_KEY: str = "tracker_sink_format"
+    TRACKER_EXTRA_KEY: str = "tracker_extra"
+    TRACKER_PROCESS_NAME_KEY: str = "tracker_process_name"
+    TRACKER_PROCESS_DESCRIPTION_KEY: str = "tracker_process_description"
+    TRACKER_TASK_NAME_KEY: str = "tracker_task_name"
+    TRACKER_TASK_DESCRIPTION_KEY: str = "tracker_task_description"
+    TRACKER_STEP_NAME_KEY: str = "tracker_step_name"
+    TRACKER_STEP_DESCRIPTION_KEY: str = "tracker_step_description"
+
+    # tracker default values
+    TRACKER_DEFAULT_PROCESS_NAME: str = "Process name not informed"
+    TRACKER_DEFAULT_PROCESS_DESCRIPTION: str = "Process description not informed"
+    TRACKER_DEFAULT_TASK_NAME: str = "Task name not informed"
+    TRACKER_DEFAULT_TASK_DESCRIPTION: str = "Task description not informed"
+    TRACKER_DEFAULT_STEP_NAME: str = "Step name not informed"
+    TRACKER_DEFAULT_STEP_DESCRIPTION: str = "Step description not informed"
+
     # logger sink default values
     LOGGER_SINK_FORMAT_DEFAULT_VALUE: str = (
         "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>"
         " | <level>{extra[handler_type]}:{level: <8}</level>"
+        " | <level>{message}</level>"
+        " | <level>Extra: {extra}</level>"
+    )
+    # tracker sink default values
+    TRACKER_SINK_FORMAT_DEFAULT_VALUE: str = (
+        "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>"
+        " | <level>{level.icon}{level: <8}</level>"
         " | <level>{message}</level>"
         " | <level>Extra: {extra}</level>"
     )
@@ -50,5 +75,10 @@ class Constants:
         Handler.LOGGER: {
             LOGGER_SINK_FORMAT_KEY: LOGGER_SINK_FORMAT_DEFAULT_VALUE,
             LOGGER_EXTRA_KEY: [],
+        },
+        Handler.TRACKER: {
+            TRACKER_SINK_FORMAT_KEY: TRACKER_SINK_FORMAT_DEFAULT_VALUE,
+            TRACKER_EXTRA_KEY: [],
+            TRACKER_PROCESS_NAME_KEY: TRACKER_DEFAULT_PROCESS_NAME,
         },
     }

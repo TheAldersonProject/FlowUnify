@@ -7,7 +7,7 @@ from typing import Any
 from opsdataflow.tools import singleton
 from opsdataflow.tools.uuid import generate_uuid4
 from opsdataflow.track_flow.constants import Constants
-from opsdataflow.track_flow.enums import Handler, TrackerGroup, TrackerLevel
+from opsdataflow.track_flow.enums import Handler, LoggerLevel, TrackerGroup, TrackerLevel
 from opsdataflow.track_flow.handler_configuration import HandlerConfiguration
 from opsdataflow.track_flow.track_handler import Track
 
@@ -61,7 +61,7 @@ class Tracker(Track):
         # default sink to sys.stdout
         super().reporter.add(
             sink=sys.stdout,
-            level=TrackerLevel.EVENT.value,
+            level=LoggerLevel.TRACE.value,
             format=self.__parameters[Constants.TRACKER_SINK_FORMAT_KEY],
             filter=None,
             colorize=True,
@@ -74,7 +74,9 @@ class Tracker(Track):
             **kwargs,
         )
 
-    def event(self, message: str, **kwargs: Any) -> None:
+    def event(
+        self, message: str, event_type: TrackerGroup | TrackerLevel | LoggerLevel | None = None, **kwargs: Any
+    ) -> None:
         """Report an event asynchronously.
 
         This method is designed to report a specific event by taking in a message and optional keyword arguments.
@@ -82,6 +84,7 @@ class Tracker(Track):
         the given parameters, executing it using `asyncio.run`.
 
         Args:
+            event_type: Type of the event.
             message: A string representing the event message to be reported.
             **kwargs: Additional optional key-value arguments to further describe the event.
 
@@ -96,12 +99,13 @@ class Tracker(Track):
         if "parent_uuid" not in kwargs:
             kwargs["parent_uuid"] = self.__current_group_uuid
 
+        event_type = event_type or self.__event_of_type
         asyncio.run(
             super().report(
-                self.__event_of_type,
+                event_type,
                 message,
                 process_uuid=self.__process_uuid,
-                event_of_type=self.__event_of_type.name.title(),
+                event_of_type=event_type.name.title(),
                 **kwargs,
             )
         )
@@ -236,3 +240,27 @@ class Tracker(Track):
             self.end_task()
             self.__process_uuid = None
             self.__current_group_uuid = None
+
+    def trace(self, message: str, **kwargs: Any) -> None:
+        """Encapsulated trace method with automatic UID inclusion."""
+        self.event(event_type=LoggerLevel.TRACE, message=message, **kwargs)
+
+    def debug(self, message: str, **kwargs: Any) -> None:
+        """Encapsulated debug method with automatic UID inclusion."""
+        self.event(event_type=LoggerLevel.DEBUG, message=message, **kwargs)
+
+    def info(self, message: str, **kwargs: Any) -> None:
+        """Encapsulated info method with automatic UID inclusion."""
+        self.event(event_type=LoggerLevel.INFO, message=message, **kwargs)
+
+    def warning(self, message: str, **kwargs: Any) -> None:
+        """Encapsulated warning method with automatic UID inclusion."""
+        self.event(event_type=LoggerLevel.WARNING, message=message, **kwargs)
+
+    def error(self, message: str, **kwargs: Any) -> None:
+        """Encapsulated error method with automatic UID inclusion."""
+        self.event(event_type=LoggerLevel.ERROR, message=message, **kwargs)
+
+    def critical(self, message: str, exc_info: str | Exception | None = None, **kwargs: Any) -> None:
+        """Encapsulated critical method with automatic UID inclusion."""
+        self.event(event_type=LoggerLevel.CRITICAL, message=message, exc_info=exc_info, **kwargs)

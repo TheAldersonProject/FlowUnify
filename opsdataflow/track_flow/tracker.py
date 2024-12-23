@@ -24,11 +24,16 @@ class Tracker(Track):
             handler_uuid=self.__parameters.get(Constants.HANDLER_UUID_KEY, generate_uuid4()),
             **kwargs,
         )
-        # process information
-        self.__process_uuid: str | None = None
+
+        # current group information
         self.__name: str | None = None
         self.__description: str | None = None
         self.__parent_uuid: str | None = None
+        self.__current_group_uuid: str | None = None
+        self.__event_of_type: TrackerLevel | TrackerGroup = TrackerGroup.PROCESS
+
+        # process information
+        self.__process_uuid: str | None = None
 
         # task information
         self.__task_uuid: str | None = None
@@ -36,28 +41,40 @@ class Tracker(Track):
         # step information
         self.__step_uuid: str | None = None
 
-        # main information
-        self.__current_group_uuid: str | None = None
-        self.__event_of_type: TrackerLevel | TrackerGroup = TrackerGroup.PROCESS
-
+        # main configuration
         self.__sink_basic_configuration()
-        self.__set_event_level()
         self.__set_group_levels()
 
     def __set_group_levels(self) -> None:
-        """Sets all the group levels."""
+        """Sets the group levels for the reporter.
+
+        This method defines the levels of grouping used within the tracker system and assigns properties such as names,
+        numeric values, colors, and icons to these levels. Each level corresponds to a specific group in the tracker,
+        facilitating the visual distinction and organization of processes, tasks, and steps.
+
+        Raises:
+            None
+
+        Returns:
+            None
+        """
         super().reporter.level(
             name=TrackerGroup.PROCESS.name, no=TrackerGroup.PROCESS.value, color="<green>", icon="✨"
         )
         super().reporter.level(name=TrackerGroup.TASK.name, no=TrackerGroup.TASK.value, color="<yellow>", icon="🗒️")
         super().reporter.level(name=TrackerGroup.STEP.name, no=TrackerGroup.STEP.value, color="<cyan>", icon="👣️")
 
-    def __set_event_level(self) -> None:
-        """Set the configuration for Tracker levels."""
-        super().reporter.level(name=TrackerLevel.EVENT.name, no=TrackerLevel.EVENT.value, color="<blue>", icon="✨")
-
     def __sink_basic_configuration(self, **kwargs: Any) -> None:
-        """Set the configuration for Reporter sink."""
+        """Configures the basic setup for the sink.
+
+        This method sets up the default sink for system standard output and configures
+        various parameters for logging. It primarily supports the customization of logging
+        behavior using the provided parameters.
+
+        Args:
+            **kwargs: Additional keyword arguments that may be used to further customize
+                the sink configuration, passed directly to the `add` method of the reporter.
+        """
         # default sink to sys.stdout
         super().reporter.add(
             sink=sys.stdout,
@@ -203,6 +220,9 @@ class Tracker(Track):
         **kwargs: Any,
     ) -> None:
         """Starts the process tracking group."""
+        if self.__process_uuid:
+            self.end_task()
+
         self.__start_group(
             group=TrackerGroup.PROCESS,
             name=name,

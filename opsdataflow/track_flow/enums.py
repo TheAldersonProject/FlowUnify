@@ -79,6 +79,32 @@ class TrackerLevel(IntEnum):
         return Level(self.name, self.value)
 
 
+class TrackerGroup(IntEnum):
+    """Enumeration to define tracker groups for event categorization.
+
+    This class defines various groups for organizing and categorizing events based on their context such as processes,
+    tasks, and steps. Each group is associated with an integer value and has a predefined hierarchy for better
+    classification.
+
+    Attributes:
+        PROCESS (int): Represents a process encompassing multiple events.
+        TASK (int): Groups specific events under a predefined task context.
+        STEP (int): Groups events under a specific step, requiring a parent task for categorization.
+    """
+
+    PROCESS = 120  # Process to group all events.
+    TASK = 110  # Groups specific events under a pre-defined task.
+    STEP = 100  # To group all events under a specific step. must have a task to be grouped by.
+
+    def __str__(self) -> str:
+        """Overwrites the __str__ method to retrieve the name.title() of the severity level."""
+        return self.name.title()
+
+    def as_tuple(self) -> Level:
+        """Retrieves the log level name and value as a NamedTuple."""
+        return Level(self.name, self.value)
+
+
 class Handler(IntEnum):
     """Enumeration to define different handler types.
 

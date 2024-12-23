@@ -1,5 +1,5 @@
 """Tracker library tools and functionalities."""
 
-from opsdataflow.track_flow.logger import Logger
+from opsdataflow.track_flow.tracker import Tracker
 
-__all__ = ["Logger"]
+__all__ = ["Tracker"]

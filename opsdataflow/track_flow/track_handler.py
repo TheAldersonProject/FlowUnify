@@ -53,7 +53,13 @@ class Track:
         """Returns the Loguru Logger instance."""
         return self._logger
 
-    async def report(self, level: LoggerLevel | TrackerLevel | TrackerGroup, message: str, **kwargs: Any) -> None:
+    async def report(
+        self,
+        level: LoggerLevel | TrackerLevel | TrackerGroup,
+        message: str,
+        handler: Handler | None = None,
+        **kwargs: Any,
+    ) -> None:
         """Unique point to apply changes and log."""
         now_utc: str = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
@@ -63,7 +69,7 @@ class Track:
             event_uuid=generate_uuid4(),
             parent_handler_uuid=self.__parent_handler_uuid,
             handler_uuid=self.__handler_uuid,
-            handler_type=self.__handler.name,
+            handler_type=handler.name if handler else self.__handler.name,
             generated_utc_timestamp=now_utc,
             **kwargs,
         )

@@ -5,11 +5,11 @@ from opsdataflow.track_flow.enums import Handler
 from opsdataflow.track_flow.handler_configuration import HandlerConfiguration
 
 # using default values
-parameters: dict[str, Any] = HandlerConfiguration(Handler.LOGGER).configure()
+parameters: dict[str, Any] = HandlerConfiguration(Handler.LOGGER).build()
 logger.debug(f"Parameters: {parameters}")
 
 # Providing configuration
-parameters: dict[str, Any] = HandlerConfiguration(Handler.LOGGER).configure(
+parameters: dict[str, Any] = HandlerConfiguration(Handler.LOGGER).build(
     my_var="some var.",
     my_other_var="some other var."
 )

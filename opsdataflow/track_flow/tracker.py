@@ -25,6 +25,8 @@ class Tracker(Track):
             **kwargs,
         )
 
+        self.__logger: Any = None
+
         # current group information
         self.__name: str | None = None
         self.__description: str | None = None
@@ -44,6 +46,11 @@ class Tracker(Track):
         # main configuration
         self.__sink_basic_configuration()
         self.__set_group_levels()
+        self.__set_tracker_levels()
+
+    def __set_tracker_levels(self) -> None:
+        """Sets the tracker levels for the reporter."""
+        super().reporter.level(name=TrackerLevel.BUSINESS.name, no=TrackerLevel.BUSINESS.value, color="<magenta>")
 
     def __set_group_levels(self) -> None:
         """Sets the group levels for the reporter.
@@ -51,12 +58,6 @@ class Tracker(Track):
         This method defines the levels of grouping used within the tracker system and assigns properties such as names,
         numeric values, colors, and icons to these levels. Each level corresponds to a specific group in the tracker,
         facilitating the visual distinction and organization of processes, tasks, and steps.
-
-        Raises:
-            None
-
-        Returns:
-            None
         """
         super().reporter.level(
             name=TrackerGroup.PROCESS.name, no=TrackerGroup.PROCESS.value, color="<green>", icon="✨"
@@ -76,6 +77,7 @@ class Tracker(Track):
                 the sink configuration, passed directly to the `add` method of the reporter.
         """
         # default sink to sys.stdout
+        """Set the configuration for Reporter sink."""
         super().reporter.add(
             sink=sys.stdout,
             level=LoggerLevel.TRACE.value,
@@ -91,7 +93,16 @@ class Tracker(Track):
             **kwargs,
         )
 
-    def event(
+        super().reporter.add(
+            sink=f"../../sink/{super().handler_uuid}.log",
+            format="{extra[serialized]}",
+            level=LoggerLevel.TRACE.value,
+            enqueue=True,
+            catch=False,
+            serialize=True,
+        )
+
+    def __event(
         self, message: str, event_type: TrackerGroup | TrackerLevel | LoggerLevel | None = None, **kwargs: Any
     ) -> None:
         """Report an event asynchronously.
@@ -203,7 +214,7 @@ class Tracker(Track):
 
         self.__event_of_type = group
         self.__current_group_uuid = event_group_uuid
-        self.event(
+        self.__event(
             uuid=event_group_uuid,
             message=event_greeting,
             parent_uuid=self.__parent_uuid,
@@ -261,26 +272,30 @@ class Tracker(Track):
             self.__process_uuid = None
             self.__current_group_uuid = None
 
+    def business(self, message: str, **kwargs: Any) -> None:
+        """Encapsulated trace method with automatic UID inclusion."""
+        self.__event(event_type=TrackerLevel.BUSINESS, message=message, business_context=message, **kwargs)
+
     def trace(self, message: str, **kwargs: Any) -> None:
         """Encapsulated trace method with automatic UID inclusion."""
-        self.event(event_type=LoggerLevel.TRACE, message=message, **kwargs)
+        self.__event(event_type=LoggerLevel.TRACE, message=message, **kwargs)
 
     def debug(self, message: str, **kwargs: Any) -> None:
         """Encapsulated debug method with automatic UID inclusion."""
-        self.event(event_type=LoggerLevel.DEBUG, message=message, **kwargs)
+        self.__event(event_type=LoggerLevel.DEBUG, message=message, **kwargs)
 
     def info(self, message: str, **kwargs: Any) -> None:
         """Encapsulated info method with automatic UID inclusion."""
-        self.event(event_type=LoggerLevel.INFO, message=message, **kwargs)
+        self.__event(event_type=LoggerLevel.INFO, message=message, **kwargs)
 
     def warning(self, message: str, **kwargs: Any) -> None:
         """Encapsulated warning method with automatic UID inclusion."""
-        self.event(event_type=LoggerLevel.WARNING, message=message, **kwargs)
+        self.__event(event_type=LoggerLevel.WARNING, message=message, **kwargs)
 
     def error(self, message: str, **kwargs: Any) -> None:
         """Encapsulated error method with automatic UID inclusion."""
-        self.event(event_type=LoggerLevel.ERROR, message=message, **kwargs)
+        self.__event(event_type=LoggerLevel.ERROR, message=message, **kwargs)
 
     def critical(self, message: str, exc_info: str | Exception | None = None, **kwargs: Any) -> None:
         """Encapsulated critical method with automatic UID inclusion."""
-        self.event(event_type=LoggerLevel.CRITICAL, message=message, exc_info=exc_info, **kwargs)
+        self.__event(event_type=LoggerLevel.CRITICAL, message=message, exc_info=exc_info, **kwargs)

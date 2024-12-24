@@ -8,64 +8,54 @@ from opsdataflow.tools import singleton
 from opsdataflow.tools.uuid import generate_uuid4
 from opsdataflow.track_flow.constants import Constants
 from opsdataflow.track_flow.enums import Handler, LoggerLevel, TrackerGroup, TrackerLevel
-from opsdataflow.track_flow.handler_configuration import HandlerConfiguration
-from opsdataflow.track_flow.track_handler import Track
+from opsdataflow.track_flow.tracker_configuration import TrackerConfiguration
 
 
 @singleton
-class Tracker(Track):
+class Tracker(TrackerConfiguration):
     """Tracker class."""
 
-    def __init__(self, **kwargs: Any) -> None:
+    def __init__(self, handler: Handler = Handler.TRACKER, **kwargs: Any) -> None:
         """Logger class init method."""
-        self.__parameters: dict[str, Any] = HandlerConfiguration(Handler.TRACKER).build(**kwargs)
-        super().__init__(
-            handler=Handler.TRACKER,
-            handler_uuid=self.__parameters.get(Constants.HANDLER_UUID_KEY, generate_uuid4()),
-            **kwargs,
-        )
-
+        # instance configuration
         self.__logger: Any = None
+        self.__handler: Handler = handler
 
-        # current group information
+        # service configuration
+        self.__handler_uuid: str = generate_uuid4()
+
+        # super class initialization
+        super().__init__(handler=handler, **kwargs)
+
+        # build general parameters
+        self.__parameters: dict[str, Any] = super().build(**kwargs)
+
+        # group general information
         self.__name: str | None = None
         self.__description: str | None = None
         self.__parent_uuid: str | None = None
         self.__current_group_uuid: str | None = None
         self.__event_of_type: TrackerLevel | TrackerGroup = TrackerGroup.PROCESS
 
-        # process information
+        # process information -- uuid
         self.__process_uuid: str | None = None
 
-        # task information
+        # task information -- uuid
         self.__task_uuid: str | None = None
 
-        # step information
+        # step information -- uuid
         self.__step_uuid: str | None = None
 
-        # main configuration
-        self.__sink_basic_configuration()
-        self.__set_group_levels()
-        self.__set_tracker_levels()
+        # service setup
+        self.__sink_setup()
+        self.__tracker_level_setup()
+        self.__group_level_setup()
 
-    def __set_tracker_levels(self) -> None:
-        """Sets the tracker levels for the reporter."""
-        super().reporter.level(name=TrackerLevel.BUSINESS.name, no=TrackerLevel.BUSINESS.value, color="<magenta>")
+    def add_sink_setup(self, **kwargs: Any) -> None:
+        """Adds a sink setup to the reporter."""
+        super().reporter.add(**kwargs)
 
-    def __set_group_levels(self) -> None:
-        """Sets the group levels for the reporter.
-
-        This method defines the levels of grouping used within the tracker system and assigns properties such as names,
-        numeric values, colors, and icons to these levels. Each level corresponds to a specific group in the tracker,
-        facilitating the visual distinction and organization of processes, tasks, and steps.
-        """
-        super().reporter.level(
-            name=TrackerGroup.PROCESS.name, no=TrackerGroup.PROCESS.value, color="<green>", icon="✨"
-        )
-        super().reporter.level(name=TrackerGroup.TASK.name, no=TrackerGroup.TASK.value, color="<yellow>", icon="🗒️")
-        super().reporter.level(name=TrackerGroup.STEP.name, no=TrackerGroup.STEP.value, color="<cyan>", icon="👣️")
-
-    def __sink_basic_configuration(self, **kwargs: Any) -> None:
+    def __sink_setup(self, **kwargs: Any) -> None:
         """Configures the basic setup for the sink.
 
         This method sets up the default sink for system standard output and configures
@@ -77,29 +67,17 @@ class Tracker(Track):
                 the sink configuration, passed directly to the `add` method of the reporter.
         """
         # default sink to sys.stdout
-        """Set the configuration for Reporter sink."""
         super().reporter.add(
             sink=sys.stdout,
             level=LoggerLevel.TRACE.value,
             format=self.__parameters[Constants.TRACKER_SINK_FORMAT_KEY],
-            filter=None,
             colorize=True,
             serialize=False,
             backtrace=True,
             diagnose=True,
             enqueue=False,
-            context=None,
             catch=True,
             **kwargs,
-        )
-
-        super().reporter.add(
-            sink=f"../../sink/{super().handler_uuid}.log",
-            format="{extra[serialized]}",
-            level=LoggerLevel.TRACE.value,
-            enqueue=True,
-            catch=False,
-            serialize=True,
         )
 
     def __event(
@@ -132,11 +110,29 @@ class Tracker(Track):
             super().report(
                 event_type,
                 message,
+                handler=self.__handler,
                 process_uuid=self.__process_uuid,
                 event_of_type=event_type.name.title(),
                 **kwargs,
             )
         )
+
+    def __group_level_setup(self) -> None:
+        """Sets the group levels for the reporter.
+
+        This method defines the levels of grouping used within the tracker system and assigns properties such as names,
+        numeric values, colors, and icons to these levels. Each level corresponds to a specific group in the tracker,
+        facilitating the visual distinction and organization of processes, tasks, and steps.
+        """
+        super().reporter.level(
+            name=TrackerGroup.PROCESS.name, no=TrackerGroup.PROCESS.value, color="<green>", icon="✨"
+        )
+        super().reporter.level(name=TrackerGroup.TASK.name, no=TrackerGroup.TASK.value, color="<yellow>", icon="🗒️")
+        super().reporter.level(name=TrackerGroup.STEP.name, no=TrackerGroup.STEP.value, color="<cyan>", icon="👣️")
+
+    def __tracker_level_setup(self) -> None:
+        """Sets the tracker levels for the reporter."""
+        super().reporter.level(name=TrackerLevel.BUSINESS.name, no=TrackerLevel.BUSINESS.value, color="<magenta>")
 
     def __start_group(
         self,
@@ -224,11 +220,7 @@ class Tracker(Track):
         )
 
     def process(
-        self,
-        name: str | None = None,
-        description: str | None = None,
-        parent_uuid: str | None = None,
-        **kwargs: Any,
+        self, name: str | None = None, description: str | None = None, parent_uuid: str | None = None, **kwargs: Any
     ) -> None:
         """Starts the process tracking group."""
         if self.__process_uuid:

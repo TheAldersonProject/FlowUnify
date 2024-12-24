@@ -1,5 +1,7 @@
 """Logger handler."""
 
+import json
+from copy import deepcopy
 from datetime import UTC, datetime
 from typing import Any
 
@@ -45,8 +47,76 @@ class Track:
             generated_utc_timestamp="",
         )
 
+        def serialize(record: Any) -> str:
+            """Serialize the record."""
+            _record_extra: dict[str, Any] = deepcopy(record["extra"])
+            if "serialized" in _record_extra:
+                del _record_extra["serialized"]
+
+            def get_extra_values(key: str) -> Any:
+                """Get the value of the extra key."""
+                if key not in _record_extra:
+                    return "Not found"
+
+                value = _record_extra.get(key, "")
+                del _record_extra[key]
+                return value
+
+            common_header: dict[str, Any] = {
+                "utc_timestamp": get_extra_values("generated_utc_timestamp"),
+                "parent_uuid": get_extra_values("parent_uuid"),
+                "process_uuid": get_extra_values("process_uuid"),
+            }
+
+            common_additional_information: dict[str, Any] = {
+                "handler_type": get_extra_values("handler_type"),
+                "reported_message": record["message"],
+                "handler_uuid": get_extra_values("handler_uuid"),
+                "time_elapsed": str(record["elapsed"]),
+            }
+
+            subset: dict[str, Any] = {
+                "event_type": record["level"].name,
+                "uuid": get_extra_values("event_uuid"),
+                "header": {} | common_header,
+                "additional_information": {} | common_additional_information,
+            }
+
+            if record["level"].name in [TrackerGroup.PROCESS.name, TrackerGroup.TASK.name, TrackerGroup.STEP.name]:
+                subset |= {
+                    "data": {
+                        "name": get_extra_values("name"),
+                        "description": get_extra_values("description"),
+                    }
+                }
+            elif record["level"].name == TrackerLevel.BUSINESS.name:
+                subset |= {
+                    "data": {
+                        "context": get_extra_values("business_context"),
+                    }
+                }
+            else:
+                subset |= {
+                    "data": {
+                        "log": record.get("message", "Not informed"),
+                    }
+                }
+
+            subset |= {"extra-values": _record_extra}
+            return json.dumps(subset)
+
+        def patching(record: Any) -> None:
+            """Patch the record."""
+            record["extra"]["serialized"] = serialize(record)
+
         # removes the default handler
         self._logger.remove(0)
+        self._logger = logger.patch(patching)
+
+    @property
+    def handler_uuid(self) -> str:
+        """Returns the handler UUID."""
+        return self.__handler_uuid
 
     @property
     def reporter(self) -> Any:

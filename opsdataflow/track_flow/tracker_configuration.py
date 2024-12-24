@@ -1,6 +1,7 @@
 """Logger handler."""
 
 import json
+import sys
 from copy import deepcopy
 from datetime import UTC, datetime
 from typing import Any
@@ -35,7 +36,7 @@ class TrackerConfiguration:
         self._configuration: dict[str, Any] = deepcopy(Constants.DEFAULT_CONFIGURATIONS[handler])
 
         # initialize with default sink
-        self.__handler_default_sink_configuration()
+        self.__handler_default_sink_configuration(**kwargs)
 
     def build(self, **kwargs: Any) -> dict[str, Any]:
         """Builds the handler with the provided settings.
@@ -77,7 +78,7 @@ class TrackerConfiguration:
 
         return self._configuration
 
-    def __handler_default_sink_configuration(self) -> None:
+    def __handler_default_sink_configuration(self, **kwargs: Any) -> None:
         """Set the configuration for Reporter sink."""
         self._logger.bind(
             event_uuid="",
@@ -150,9 +151,27 @@ class TrackerConfiguration:
             """Patch the record."""
             record["extra"]["serialized"] = serialize(record)
 
+        # sets format for output
+        _format: str = self._configuration[Constants.TRACKER_SINK_FORMAT_KEY]
+        if "tracker_sink_format" in kwargs:
+            _format = kwargs["tracker_sink_format"]
+            del kwargs["tracker_sink_format"]
+
         # removes the default handler
         self._logger.remove(0)
         self._logger = logger.patch(patching)
+        self._logger.add(
+            sink=sys.stdout,
+            level=LoggerLevel.TRACE.value,
+            format=_format,
+            colorize=True,
+            serialize=False,
+            backtrace=True,
+            diagnose=True,
+            enqueue=False,
+            catch=True,
+            **kwargs,
+        )
 
     @property
     def handler_uuid(self) -> str:

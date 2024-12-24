@@ -12,7 +12,7 @@ from opsdataflow.track_flow.constants import Constants
 from opsdataflow.track_flow.enums import Handler, LoggerLevel, TrackerGroup, TrackerLevel
 
 
-class Track:
+class TrackerConfiguration:
     """Logger class used to configure and handle logging activities.
 
     This class is designed to manage log records through the Loguru logging library. It includes mechanisms to set up
@@ -20,21 +20,62 @@ class Track:
     various levels with enriched metadata.
 
     Attributes:
-        __handler (Handler): The handler instance associated with the logger, indicating the type of handling performed.
         __handler_uuid (str): Unique identifier for the current handler.
         __parent_handler_uuid (str | None): Identifier for the parent handler, if applicable.
         _logger: The Loguru logger instance used for logging.
     """
 
-    def __init__(self, handler: Handler, parent_handler_uuid: str | None = None, **kwargs: Any) -> None:
+    def __init__(self, handler: Handler, **kwargs: Any) -> None:
         """Logger class init method."""
-        self.__handler: Handler = handler
         self.__handler_uuid: str = kwargs.get(Constants.HANDLER_UUID_KEY, "")
-        self.__parent_handler_uuid: str | None = parent_handler_uuid
+        self.__parent_handler_uuid: str | None = kwargs["parent_handler_uuid"] if "parent_uuid" in kwargs else None
         self._logger = logger
+
+        # general service configuration
+        self._configuration: dict[str, Any] = deepcopy(Constants.DEFAULT_CONFIGURATIONS[handler])
 
         # initialize with default sink
         self.__handler_default_sink_configuration()
+
+    def build(self, **kwargs: Any) -> dict[str, Any]:
+        """Builds the handler with the provided settings.
+
+        This method accepts dynamic keyword arguments to configure a handler instance. It validates the provided keys
+        against a predefined configuration dictionary.
+        If a key matches the predefined configuration, its value is updated; otherwise, unrecognized keys
+        are stored as extra settings. The method also generates a unique identifier (UUID) for the handler instance.
+
+        Args:
+            kwargs: Variable keyword arguments representing the configuration options.
+
+        Returns:
+            A dictionary containing the configured settings, including updated values and extras.
+        """
+        if not kwargs:
+            logger.debug("No information provided for configuration.")
+            logger.debug("Default values will be applied.")
+
+        else:
+            params: dict[str, Any] = dict(**kwargs)
+            logger.debug(f"Config keys: {params.keys()}")
+
+            for k, v in params.items():
+                clean_key: str = str(k).lower().strip()
+                logger.debug(f"Validating key: {clean_key}.")
+                if clean_key in self._configuration:
+                    self._configuration[clean_key] = v
+                    logger.debug(f"Key <{clean_key}> set with value of type: <{type(v)}>")
+                else:
+                    logger.debug(f"Key '{k}' not found in default configuration, will be added to extras.")
+                    self._configuration[Constants.LOGGER_EXTRA_KEY].append({clean_key: v})
+
+        self._configuration[Constants.HANDLER_UUID_KEY] = generate_uuid4()
+        logger.debug(
+            f"Handler configuration set for handler type: {Handler.LOGGER.name} "
+            f"with UID: {self._configuration[Constants.HANDLER_UUID_KEY]}"
+        )
+
+        return self._configuration
 
     def __handler_default_sink_configuration(self) -> None:
         """Set the configuration for Reporter sink."""
@@ -127,7 +168,7 @@ class Track:
         self,
         level: LoggerLevel | TrackerLevel | TrackerGroup,
         message: str,
-        handler: Handler | None = None,
+        handler: Handler,
         **kwargs: Any,
     ) -> None:
         """Unique point to apply changes and log."""
@@ -139,7 +180,7 @@ class Track:
             event_uuid=generate_uuid4(),
             parent_handler_uuid=self.__parent_handler_uuid,
             handler_uuid=self.__handler_uuid,
-            handler_type=handler.name if handler else self.__handler.name,
+            handler_type=handler.name,
             generated_utc_timestamp=now_utc,
             **kwargs,
         )

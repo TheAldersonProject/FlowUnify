@@ -9,7 +9,7 @@ tracker_sink_format: str = (
 )
 tracker = Tracker(tracker_sink_format=tracker_sink_format)
 tracker.add_sink_setup(
-    sink="../../sink/my.log",
+    sink="../../sink/my22.log",
     format="{extra[serialized]}",
     level=LoggerLevel.TRACE.value,
     enqueue=True,

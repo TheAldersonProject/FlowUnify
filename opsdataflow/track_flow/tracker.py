@@ -1,7 +1,6 @@
 """Tracker handler."""
 
 import asyncio
-import sys
 from typing import Any
 
 from opsdataflow.tools import singleton
@@ -35,7 +34,6 @@ class Tracker(TrackerConfiguration):
         self.__description: str | None = None
         self.__parent_uuid: str | None = None
         self.__current_group_uuid: str | None = None
-        self.__event_of_type: TrackerLevel | TrackerGroup = TrackerGroup.PROCESS
 
         # process information -- uuid
         self.__process_uuid: str | None = None
@@ -47,7 +45,6 @@ class Tracker(TrackerConfiguration):
         self.__step_uuid: str | None = None
 
         # service setup
-        self.__sink_setup()
         self.__tracker_level_setup()
         self.__group_level_setup()
 
@@ -55,34 +52,7 @@ class Tracker(TrackerConfiguration):
         """Adds a sink setup to the reporter."""
         super().reporter.add(**kwargs)
 
-    def __sink_setup(self, **kwargs: Any) -> None:
-        """Configures the basic setup for the sink.
-
-        This method sets up the default sink for system standard output and configures
-        various parameters for logging. It primarily supports the customization of logging
-        behavior using the provided parameters.
-
-        Args:
-            **kwargs: Additional keyword arguments that may be used to further customize
-                the sink configuration, passed directly to the `add` method of the reporter.
-        """
-        # default sink to sys.stdout
-        super().reporter.add(
-            sink=sys.stdout,
-            level=LoggerLevel.TRACE.value,
-            format=self.__parameters[Constants.TRACKER_SINK_FORMAT_KEY],
-            colorize=True,
-            serialize=False,
-            backtrace=True,
-            diagnose=True,
-            enqueue=False,
-            catch=True,
-            **kwargs,
-        )
-
-    def __event(
-        self, message: str, event_type: TrackerGroup | TrackerLevel | LoggerLevel | None = None, **kwargs: Any
-    ) -> None:
+    def __event(self, message: str, event_type: TrackerGroup | TrackerLevel | LoggerLevel, **kwargs: Any) -> None:
         """Report an event asynchronously.
 
         This method is designed to report a specific event by taking in a message and optional keyword arguments.
@@ -105,14 +75,12 @@ class Tracker(TrackerConfiguration):
         if "parent_uuid" not in kwargs:
             kwargs["parent_uuid"] = self.__current_group_uuid
 
-        event_type = event_type or self.__event_of_type
         asyncio.run(
             super().report(
-                event_type,
-                message,
+                level=event_type,
+                message=message,
                 handler=self.__handler,
                 process_uuid=self.__process_uuid,
-                event_of_type=event_type.name.title(),
                 **kwargs,
             )
         )
@@ -208,9 +176,9 @@ class Tracker(TrackerConfiguration):
                     f"Step started: {self.__name} Description: {self.__description} " f"UUID: {event_group_uuid}"
                 )
 
-        self.__event_of_type = group
         self.__current_group_uuid = event_group_uuid
         self.__event(
+            event_type=group,
             uuid=event_group_uuid,
             message=event_greeting,
             parent_uuid=self.__parent_uuid,
@@ -247,7 +215,6 @@ class Tracker(TrackerConfiguration):
         if self.__step_uuid:
             self.__step_uuid = None
             self.__current_group_uuid = self.__task_uuid or self.task()
-            self.__event_of_type = TrackerGroup.TASK
 
     def end_task(self) -> None:
         """Ends the task tracking group."""
@@ -255,7 +222,6 @@ class Tracker(TrackerConfiguration):
             self.end_step()
             self.__task_uuid = None
             self.__current_group_uuid = self.__process_uuid or self.process()
-            self.__event_of_type = TrackerGroup.PROCESS
 
     def end_process(self) -> None:
         """Ends the process tracking group."""

@@ -1,3 +1,4 @@
+from opsdataflow.track_flow.enums import LoggerLevel
 from opsdataflow.track_flow.tracker import Tracker
 
 tracker_sink_format: str = (
@@ -7,6 +8,15 @@ tracker_sink_format: str = (
     # " | <level>Extra: {extra}</level>"
 )
 tracker = Tracker(tracker_sink_format=tracker_sink_format)
+tracker.add_sink_setup(
+    sink="../../sink/my.log",
+    format="{extra[serialized]}",
+    level=LoggerLevel.TRACE.value,
+    enqueue=True,
+    catch=False,
+    serialize=True,
+)
+
 tracker.process(
     name="I am a process. My name is ProcessMe.",
     description="My description",

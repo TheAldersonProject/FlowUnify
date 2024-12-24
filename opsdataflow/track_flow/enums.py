@@ -62,13 +62,13 @@ class TrackerLevel(IntEnum):
         SECURITY (int): Events related to security.
     """
 
-    EVENT = 55  # Event itself
-    BUSINESS = 60  # Events related to business
-    DEVOPS = 65  # Events related to DevOps
-    DATA_SOURCE = 70  # Events related to data sources
-    DATA_SET = 75  # Events related to datasets
-    DATAOPS = 80  # Events related
-    SECURITY = 100  # Events related to security
+    EVENT = 130  # Generic event, same as the "Info" level.
+    BUSINESS = 140  # Events related to business
+    DEVOPS = 150  # Events related to DevOps
+    SECURITY = 180  # Events related to security
+    DATAOPS = 160  # Events related
+    DATA_SOURCE = 170  # Events related to data sources
+    DATA_SET = 170  # Events related to datasets
 
     def __str__(self) -> str:
         """Overwrites the __str__ method to retrieve the name.title() of the severity level."""

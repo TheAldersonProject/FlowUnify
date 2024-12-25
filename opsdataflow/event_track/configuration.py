@@ -183,7 +183,7 @@ class Configuration:
         """Returns the Loguru Logger instance."""
         return self._logger
 
-    async def report(
+    def report(
         self,
         level: LoggerLevel | TrackerLevel | TrackerGroup,
         message: str,

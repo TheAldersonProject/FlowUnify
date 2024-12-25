@@ -1,6 +1,5 @@
 """Tracker handler."""
 
-import asyncio
 from typing import Any
 
 from opsdataflow.event_track.configuration import Configuration
@@ -75,14 +74,12 @@ class Tracker(Configuration):
         if "parent_uuid" not in kwargs:
             kwargs["parent_uuid"] = self.__current_group_uuid
 
-        asyncio.run(
-            super().report(
-                level=event_type,
-                message=message,
-                handler=self.__handler,
-                process_uuid=self.__process_uuid,
-                **kwargs,
-            )
+        super().report(
+            level=event_type,
+            message=message,
+            handler=self.__handler,
+            process_uuid=self.__process_uuid,
+            **kwargs,
         )
 
     def __group_level_setup(self) -> None:

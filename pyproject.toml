@@ -1,4 +1,4 @@
-[project]
+    [project]
 name = "OpsDataFlow"
 authors = [
   { email = "thiago@thir.info" },
@@ -23,6 +23,7 @@ dependencies = [
     "loguru>=0.7.2",
     "minio>=7.2.13",
     "pydantic>=2.10.4",
+    "setuptools>=75.6.0",
     "tomli>=2.2.1",
 ]
 

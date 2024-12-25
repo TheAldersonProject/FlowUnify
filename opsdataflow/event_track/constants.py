@@ -5,7 +5,7 @@
 
 from typing import Any, ClassVar
 
-from opsdataflow.track_flow.enums import Handler
+from opsdataflow.event_track.enums import Handler
 
 
 class Constants:

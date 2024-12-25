@@ -1,5 +1,5 @@
-from opsdataflow.track_flow.enums import LoggerLevel
-from opsdataflow.track_flow.tracker import Tracker
+from opsdataflow.event_track.enums import LoggerLevel
+from opsdataflow.event_track.tracker import Tracker
 
 tracker_sink_format: str = (
     "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>"

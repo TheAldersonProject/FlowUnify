@@ -34,12 +34,12 @@ This project aims to create a centralized hub for managing data platform process
 Basic usage example:
 
 ```python
-from opsdataflow import track_flow
+from opsdataflow import event_track
 
-track_flow.start(**options)
-track_flow.event("Here goes the final message")
-track_flow.task("My task", "Task message")
-track_flow.step("My step under my task", "Step message")
+event_track.start(**options)
+event_track.event("Here goes the final message")
+event_track.task("My task", "Task message")
+event_track.step("My step under my task", "Step message")
 ```
 
 ## 🛠 Development

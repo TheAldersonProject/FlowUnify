@@ -5,13 +5,13 @@ from typing import Any
 
 from opsdataflow.tools import singleton
 from opsdataflow.tools.uuid import generate_uuid4
+from opsdataflow.track_flow.configuration import Configuration
 from opsdataflow.track_flow.constants import Constants
 from opsdataflow.track_flow.enums import Handler, LoggerLevel, TrackerGroup, TrackerLevel
-from opsdataflow.track_flow.tracker_configuration import TrackerConfiguration
 
 
 @singleton
-class Tracker(TrackerConfiguration):
+class Tracker(Configuration):
     """Tracker class."""
 
     def __init__(self, handler: Handler = Handler.TRACKER, **kwargs: Any) -> None:

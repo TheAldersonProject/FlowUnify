@@ -13,7 +13,7 @@ from opsdataflow.track_flow.constants import Constants
 from opsdataflow.track_flow.enums import Handler, LoggerLevel, TrackerGroup, TrackerLevel
 
 
-class TrackerConfiguration:
+class Configuration:
     """Logger class used to configure and handle logging activities.
 
     This class is designed to manage log records through the Loguru logging library. It includes mechanisms to set up

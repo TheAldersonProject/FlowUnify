@@ -1,7 +1,7 @@
 # type: ignore[reportAttributeAccessIssue]
 # type: ignore[reportUnknownMemberType]
 # type: ignore[reportUnknownVariableType]
-"""Tracker project constants."""
+"""signals project constants."""
 
 from typing import Any, ClassVar
 
@@ -37,24 +37,24 @@ class Constants:
     LOGGER_SINK_FORMAT_KEY: str = "logger_sink_format"
     LOGGER_EXTRA_KEY: str = "logger_extra"
 
-    # tracker keys
-    TRACKER_SINK_FORMAT_KEY: str = "tracker_sink_format"
-    TRACKER_EXTRA_KEY: str = "extra"
-    TRACKER_PROCESS_NAME_KEY: str = "process_name"
-    TRACKER_PROCESS_DESCRIPTION_KEY: str = "process_description"
-    TRACKER_TASK_NAME_KEY: str = "task_name"
-    TRACKER_TASK_DESCRIPTION_KEY: str = "task_description"
-    TRACKER_STEP_NAME_KEY: str = "step_name"
-    TRACKER_STEP_DESCRIPTION_KEY: str = "step_description"
+    # signals keys
+    SIGNALS_SINK_FORMAT_KEY: str = "signals_sink_format"
+    SIGNALS_EXTRA_KEY: str = "extra"
+    SIGNALS_PROCESS_NAME_KEY: str = "process_name"
+    SIGNALS_PROCESS_DESCRIPTION_KEY: str = "process_description"
+    SIGNALS_TASK_NAME_KEY: str = "task_name"
+    SIGNALS_TASK_DESCRIPTION_KEY: str = "task_description"
+    SIGNALS_STEP_NAME_KEY: str = "step_name"
+    SIGNALS_STEP_DESCRIPTION_KEY: str = "step_description"
 
-    # tracker default values
-    TRACKER_DEFAULT_APP_NAME: str = "App name not informed"
-    TRACKER_DEFAULT_PROCESS_NAME: str = "Process name not informed"
-    TRACKER_DEFAULT_PROCESS_DESCRIPTION: str = "Process description not informed"
-    TRACKER_DEFAULT_TASK_NAME: str = "Task name not informed"
-    TRACKER_DEFAULT_TASK_DESCRIPTION: str = "Task description not informed"
-    TRACKER_DEFAULT_STEP_NAME: str = "Step name not informed"
-    TRACKER_DEFAULT_STEP_DESCRIPTION: str = "Step description not informed"
+    # signals default values
+    SIGNALS_DEFAULT_APP_NAME: str = "App name not informed"
+    SIGNALS_DEFAULT_PROCESS_NAME: str = "Process name not informed"
+    SIGNALS_DEFAULT_PROCESS_DESCRIPTION: str = "Process description not informed"
+    SIGNALS_DEFAULT_TASK_NAME: str = "Task name not informed"
+    SIGNALS_DEFAULT_TASK_DESCRIPTION: str = "Task description not informed"
+    SIGNALS_DEFAULT_STEP_NAME: str = "Step name not informed"
+    SIGNALS_DEFAULT_STEP_DESCRIPTION: str = "Step description not informed"
 
     # logger sink default values
     LOGGER_SINK_FORMAT_DEFAULT_VALUE: str = (
@@ -63,12 +63,11 @@ class Constants:
         " | <level>{message}</level>"
         " | <level>Extra: {extra}</level>"
     )
-    # tracker sink default values
-    TRACKER_SINK_FORMAT_DEFAULT_VALUE: str = (
+    # signals sink default values
+    SIGNALS_SINK_FORMAT_DEFAULT_VALUE: str = (
         "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>"
         " | <level>{level.icon}{level: <8}</level>"
         " | <level>{message}</level>"
-        " | <level>Extra: {extra}</level>"
     )
 
     # default configurations for the handler
@@ -77,9 +76,9 @@ class Constants:
             LOGGER_SINK_FORMAT_KEY: LOGGER_SINK_FORMAT_DEFAULT_VALUE,
             LOGGER_EXTRA_KEY: [],
         },
-        Handler.TRACKER: {
-            TRACKER_SINK_FORMAT_KEY: TRACKER_SINK_FORMAT_DEFAULT_VALUE,
-            TRACKER_EXTRA_KEY: [],
-            TRACKER_PROCESS_NAME_KEY: TRACKER_DEFAULT_PROCESS_NAME,
+        Handler.SIGNALS: {
+            SIGNALS_SINK_FORMAT_KEY: SIGNALS_SINK_FORMAT_DEFAULT_VALUE,
+            SIGNALS_EXTRA_KEY: [],
+            SIGNALS_PROCESS_NAME_KEY: SIGNALS_DEFAULT_PROCESS_NAME,
         },
     }

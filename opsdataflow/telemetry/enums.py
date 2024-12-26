@@ -45,8 +45,8 @@ class LoggerLevel(IntEnum):
         return Level(self.name, self.value)
 
 
-class TrackerLevel(IntEnum):
-    """TrackerSeverityLevel Enumeration.
+class SignalsLevel(IntEnum):
+    """SignalsSeverityLevel Enumeration.
 
     Defines various severity levels for tracking events in an application. These severity levels are grouped
     based on their context such as events, business operations, DevOps, data sources, datasets, data operations,
@@ -79,7 +79,7 @@ class TrackerLevel(IntEnum):
         return Level(self.name, self.value)
 
 
-class TrackerGroup(IntEnum):
+class SignalsGroup(IntEnum):
     """Enumeration to define tracker groups for event categorization.
 
     This class defines various groups for organizing and categorizing events based on their context such as processes,
@@ -114,7 +114,7 @@ class Handler(IntEnum):
     """
 
     LOGGER = 1
-    TRACKER = 2
+    SIGNALS = 2
 
     def __str__(self) -> str:
         """Overwrites the __str__ method to retrieve the name.title() of the severity level."""

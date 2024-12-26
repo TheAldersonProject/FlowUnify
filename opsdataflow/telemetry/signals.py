@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from opsdataflow.telemetry import Configuration, Constants, Handler, LoggerLevel, TrackerGroup, TrackerLevel
+from opsdataflow.telemetry import Configuration, Constants, Handler, LoggerLevel, SignalsGroup, SignalsLevel
 from opsdataflow.tools import generate_uuid4, singleton
 
 
@@ -10,7 +10,7 @@ from opsdataflow.tools import generate_uuid4, singleton
 class Signals(Configuration):
     """Tracker class."""
 
-    def __init__(self, app_name: str | None = None, handler: Handler = Handler.TRACKER, **kwargs: Any) -> None:
+    def __init__(self, app_name: str | None = None, handler: Handler = Handler.SIGNALS, **kwargs: Any) -> None:
         """Logger class init method."""
         # instance configuration
         self.__logger: Any = None
@@ -41,14 +41,14 @@ class Signals(Configuration):
         self.__step_uuid: str | None = None
 
         # service setup
-        self.__tracker_level_setup()
+        self.__signals_level_setup()
         self.__group_level_setup()
 
     def add_sink_setup(self, **kwargs: Any) -> None:
         """Adds a sink setup to the reporter."""
         super().reporter.add(**kwargs)
 
-    def __event(self, message: str, event_type: TrackerGroup | TrackerLevel | LoggerLevel, **kwargs: Any) -> None:
+    def __event(self, message: str, event_type: SignalsGroup | SignalsLevel | LoggerLevel, **kwargs: Any) -> None:
         """Report an event asynchronously.
 
         This method is designed to report a specific event by taking in a message and optional keyword arguments.
@@ -87,18 +87,18 @@ class Signals(Configuration):
         facilitating the visual distinction and organization of processes, tasks, and steps.
         """
         super().reporter.level(
-            name=TrackerGroup.PROCESS.name, no=TrackerGroup.PROCESS.value, color="<green>", icon="✨"
+            name=SignalsGroup.PROCESS.name, no=SignalsGroup.PROCESS.value, color="<green>", icon="✨"
         )
-        super().reporter.level(name=TrackerGroup.TASK.name, no=TrackerGroup.TASK.value, color="<yellow>", icon="🗒️")
-        super().reporter.level(name=TrackerGroup.STEP.name, no=TrackerGroup.STEP.value, color="<cyan>", icon="👣️")
+        super().reporter.level(name=SignalsGroup.TASK.name, no=SignalsGroup.TASK.value, color="<yellow>", icon="🗒️")
+        super().reporter.level(name=SignalsGroup.STEP.name, no=SignalsGroup.STEP.value, color="<cyan>", icon="👣️")
 
-    def __tracker_level_setup(self) -> None:
+    def __signals_level_setup(self) -> None:
         """Sets the tracker levels for the reporter."""
-        super().reporter.level(name=TrackerLevel.BUSINESS.name, no=TrackerLevel.BUSINESS.value, color="<magenta>")
+        super().reporter.level(name=SignalsLevel.BUSINESS.name, no=SignalsLevel.BUSINESS.value, color="<magenta>")
 
     def __start_group(
         self,
-        group: TrackerGroup,
+        group: SignalsGroup,
         name: str | None = None,
         description: str | None = None,
         parent_uuid: str | None = None,
@@ -115,15 +115,15 @@ class Signals(Configuration):
         event_greeting: str = ""
         event_group_uuid: str = generate_uuid4()
         match group:
-            case TrackerGroup.PROCESS:
+            case SignalsGroup.PROCESS:
                 # sets name and description
                 self.__name = get_param_value(
-                    name, Constants.TRACKER_PROCESS_NAME_KEY, Constants.TRACKER_DEFAULT_PROCESS_NAME
+                    name, Constants.SIGNALS_PROCESS_NAME_KEY, Constants.SIGNALS_DEFAULT_PROCESS_NAME
                 )
                 self.__description = get_param_value(
                     description,
-                    Constants.TRACKER_PROCESS_DESCRIPTION_KEY,
-                    Constants.TRACKER_DEFAULT_PROCESS_DESCRIPTION,
+                    Constants.SIGNALS_PROCESS_DESCRIPTION_KEY,
+                    Constants.SIGNALS_DEFAULT_PROCESS_DESCRIPTION,
                 )
                 # process flow control
                 self.__parent_uuid = parent_uuid
@@ -134,16 +134,16 @@ class Signals(Configuration):
                     f"Process started: {self.__name} Description: {self.__description} " f"UUID: {event_group_uuid}"
                 )
 
-            case TrackerGroup.TASK:
+            case SignalsGroup.TASK:
                 if not self.__process_uuid:
                     self.process()
 
                 # sets name and description
                 self.__name = get_param_value(
-                    name, Constants.TRACKER_TASK_NAME_KEY, Constants.TRACKER_DEFAULT_TASK_NAME
+                    name, Constants.SIGNALS_TASK_NAME_KEY, Constants.SIGNALS_DEFAULT_TASK_NAME
                 )
                 self.__description = get_param_value(
-                    description, Constants.TRACKER_TASK_DESCRIPTION_KEY, Constants.TRACKER_DEFAULT_TASK_DESCRIPTION
+                    description, Constants.SIGNALS_TASK_DESCRIPTION_KEY, Constants.SIGNALS_DEFAULT_TASK_DESCRIPTION
                 )
                 # task flow control
                 self.__parent_uuid = self.__process_uuid
@@ -152,16 +152,16 @@ class Signals(Configuration):
                     f"Task started: {self.__name} Description: {self.__description} " f"UUID: {event_group_uuid}"
                 )
 
-            case TrackerGroup.STEP:
+            case SignalsGroup.STEP:
                 if not self.__task_uuid:
                     self.task()
 
                 # sets name and description
                 self.__name = get_param_value(
-                    name, Constants.TRACKER_STEP_NAME_KEY, Constants.TRACKER_DEFAULT_STEP_NAME
+                    name, Constants.SIGNALS_STEP_NAME_KEY, Constants.SIGNALS_DEFAULT_STEP_NAME
                 )
                 self.__description = get_param_value(
-                    description, Constants.TRACKER_STEP_DESCRIPTION_KEY, Constants.TRACKER_DEFAULT_STEP_DESCRIPTION
+                    description, Constants.SIGNALS_STEP_DESCRIPTION_KEY, Constants.SIGNALS_DEFAULT_STEP_DESCRIPTION
                 )
 
                 self.__parent_uuid = self.__task_uuid
@@ -189,7 +189,7 @@ class Signals(Configuration):
             self.end_task()
 
         self.__start_group(
-            group=TrackerGroup.PROCESS,
+            group=SignalsGroup.PROCESS,
             name=name,
             description=description,
             parent_uuid=parent_uuid,
@@ -198,11 +198,11 @@ class Signals(Configuration):
 
     def task(self, name: str | None = None, description: str | None = None, **kwargs: Any) -> None:
         """Starts the task tracking group."""
-        self.__start_group(group=TrackerGroup.TASK, name=name, description=description, **kwargs)
+        self.__start_group(group=SignalsGroup.TASK, name=name, description=description, **kwargs)
 
     def step(self, name: str | None = None, description: str | None = None, **kwargs: Any) -> None:
         """Starts the step tracking group."""
-        self.__start_group(group=TrackerGroup.STEP, name=name, description=description, **kwargs)
+        self.__start_group(group=SignalsGroup.STEP, name=name, description=description, **kwargs)
 
     def end_step(self) -> None:
         """Ends the step tracking group."""
@@ -226,7 +226,7 @@ class Signals(Configuration):
 
     def business(self, message: str, **kwargs: Any) -> None:
         """Encapsulated trace method with automatic UID inclusion."""
-        self.__event(event_type=TrackerLevel.BUSINESS, message=message, business_context=message, **kwargs)
+        self.__event(event_type=SignalsLevel.BUSINESS, message=message, business_context=message, **kwargs)
 
     def trace(self, message: str, **kwargs: Any) -> None:
         """Encapsulated trace method with automatic UID inclusion."""

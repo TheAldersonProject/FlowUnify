@@ -9,7 +9,7 @@ from typing import Any
 from loguru import logger
 
 from opsdataflow.telemetry.constants import Constants
-from opsdataflow.telemetry.enums import Handler, LoggerLevel, TrackerGroup, TrackerLevel
+from opsdataflow.telemetry.enums import Handler, LoggerLevel, SignalsGroup, SignalsLevel
 from opsdataflow.tools.uuid import generate_uuid4
 
 
@@ -30,7 +30,7 @@ class Configuration:
         """Logger class init method."""
         self.__handler_uuid: str = kwargs.get(Constants.HANDLER_UUID_KEY, "")
         self.__parent_handler_uuid: str | None = kwargs["parent_handler_uuid"] if "parent_uuid" in kwargs else None
-        self._app_name: str = app_name or Constants.TRACKER_DEFAULT_APP_NAME
+        self._app_name: str = app_name or Constants.SIGNALS_DEFAULT_APP_NAME
         self._logger = logger
 
         # general service configuration
@@ -126,14 +126,14 @@ class Configuration:
                 "additional_information": {} | common_additional_information,
             }
 
-            if record["level"].name in [TrackerGroup.PROCESS.name, TrackerGroup.TASK.name, TrackerGroup.STEP.name]:
+            if record["level"].name in [SignalsGroup.PROCESS.name, SignalsGroup.TASK.name, SignalsGroup.STEP.name]:
                 subset |= {
                     "data": {
                         "name": get_extra_values("name"),
                         "description": get_extra_values("description"),
                     }
                 }
-            elif record["level"].name == TrackerLevel.BUSINESS.name:
+            elif record["level"].name == SignalsLevel.BUSINESS.name:
                 subset |= {
                     "data": {
                         "context": get_extra_values("business_context"),
@@ -154,7 +154,7 @@ class Configuration:
             record["extra"]["serialized"] = serialize(record)
 
         # sets format for output
-        _format: str = self._configuration[Constants.TRACKER_SINK_FORMAT_KEY]
+        _format: str = self._configuration[Constants.SIGNALS_SINK_FORMAT_KEY]
         if "tracker_sink_format" in kwargs:
             _format = kwargs["tracker_sink_format"]
             del kwargs["tracker_sink_format"]
@@ -187,7 +187,7 @@ class Configuration:
 
     def report(
         self,
-        level: LoggerLevel | TrackerLevel | TrackerGroup,
+        level: LoggerLevel | SignalsLevel | SignalsGroup,
         message: str,
         handler: Handler,
         **kwargs: Any,

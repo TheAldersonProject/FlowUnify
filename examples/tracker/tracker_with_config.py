@@ -1,5 +1,5 @@
 from opsdataflow.telemetry.enums import LoggerLevel
-from opsdataflow.telemetry.signals import Signals
+from opsdataflow.telemetry.signals_previous_implementation import Signals
 
 tracker_sink_format: str = (
     "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>"

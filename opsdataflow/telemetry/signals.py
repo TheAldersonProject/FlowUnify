@@ -1,253 +1,327 @@
-"""Tracker handler."""
+"""Signals implementation."""
 
+import sys
+from datetime import UTC, datetime
 from typing import Any
 
-from opsdataflow.telemetry import Configuration, Constants, Handler, LoggerLevel, SignalsGroup, SignalsLevel
-from opsdataflow.tools import generate_uuid4, singleton
+from loguru import logger
+
+from opsdataflow.telemetry import TelemetryConfig
+from opsdataflow.tools import generate_uuid4
+from telemetry import Constants, SignalsGroup, SignalsLevel
 
 
-@singleton
-class Signals(Configuration):
-    """Tracker class."""
+class Signals:
+    """Class for Signals."""
 
-    def __init__(self, app_name: str | None = None, handler: Handler = Handler.SIGNALS, **kwargs: Any) -> None:
-        """Logger class init method."""
-        # instance configuration
-        self.__logger: Any = None
-        self.__handler: Handler = handler
+    def __init__(self, config: TelemetryConfig, **kwargs: Any) -> None:
+        """Initializes Signals."""
+        self.__config: TelemetryConfig = config
+        self.__logger = logger
 
-        # service configuration
-        self.__handler_uuid: str = generate_uuid4()
+        # signal attributes
+        # job uuid
+        self._job_uuid: str = generate_uuid4()
 
-        # super class initialization
-        super().__init__(handler=handler, app_name=app_name, **kwargs)
+        # group uuid
+        self._process_uuid: str | None = None
+        self._task_uuid: str | None = None
+        self._step_uuid: str | None = None
 
-        # build general parameters
-        self.__parameters: dict[str, Any] = super().build(**kwargs)
+        # process control
+        self._current_group_uuid: str | None = None
+        self._current_group_name: str | None = None
 
-        # group general information
-        self.__name: str | None = None
-        self.__description: str | None = None
-        self.__parent_uuid: str | None = None
-        self.__current_group_uuid: str | None = None
+        # setup logger
+        self.__setup_logger_main_configurations()
+        self.__setup_logger_default_output_sink(**kwargs)
 
-        # process information -- uuid
-        self.__process_uuid: str | None = None
+        # setup signals.
+        self.__setup_signals_event_types()
+        self.__setup_signals_event_groups()
 
-        # task information -- uuid
-        self.__task_uuid: str | None = None
+    def __setup_logger_main_configurations(self) -> None:
+        """Sets the logger basic configuration."""
+        self.__logger = logger.bind(
+            app_name=self.__config.app_name,
+            event_uuid="",
+            job_uuid=self.job_uuid,
+            parent_uuid=self.current_group_uuid,
+            signal_group_name="",
+            signal_timestamp=datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
+        )
+        self.__logger.remove(0)
 
-        # step information -- uuid
-        self.__step_uuid: str | None = None
+    def __setup_logger_default_output_sink(self, **kwargs: Any) -> None:
+        """Configures a sink for the logger."""
+        self.__logger.add(
+            sink=sys.stdout,
+            level=self.__config.log_from_level,
+            format=self.__config.output_format,
+            colorize=True,
+            serialize=False,
+            backtrace=True,
+            diagnose=True,
+            enqueue=False,
+            catch=True,
+            **kwargs,
+        )
 
-        # service setup
-        self.__signals_level_setup()
-        self.__group_level_setup()
+    def add_sink(self, **kwargs: Any) -> None:
+        """Adds new sink to logger."""
+        self.__logger.add(**kwargs)
 
-    def add_sink_setup(self, **kwargs: Any) -> None:
-        """Adds a sink setup to the reporter."""
-        super().reporter.add(**kwargs)
+    def __setup_signals_event_types(self) -> None:
+        """Setup signals event types."""
+        # Business level
+        self.__logger.level(
+            name=SignalsLevel.BUSINESS.name, no=SignalsLevel.BUSINESS.value, color="<magenta>", icon="🔍"
+        )
 
-    def __event(self, message: str, event_type: SignalsGroup | SignalsLevel | LoggerLevel, **kwargs: Any) -> None:
-        """Report an event asynchronously.
+    def __setup_signals_event_groups(self) -> None:
+        """Setup signals event groups."""
+        # Process group
+        self.__logger.level(name=SignalsGroup.PROCESS.name, no=SignalsGroup.PROCESS.value, color="<green>", icon="✨")
+        self.__logger.level(name=SignalsGroup.TASK.name, no=SignalsGroup.TASK.value, color="<yellow>", icon="🗒️")
+        self.__logger.level(name=SignalsGroup.STEP.name, no=SignalsGroup.STEP.value, color="<cyan>", icon="👣️")
 
-        This method is designed to report a specific event by taking in a message and optional keyword arguments.
-        It uses the asynchronous `super().report(...)` method to handle the reporting of the event with
-        the given parameters, executing it using `asyncio.run`.
+    def log(self, level: str, message: str, event_uuid: str | None = None, **kwargs: Any) -> None:
+        """Emit logs."""
+        _event_uuid: str = event_uuid or generate_uuid4()
+        self.__logger.log(
+            level,
+            message,
+            event_uuid=_event_uuid,
+            parent_uuid=self._current_group_uuid,
+            signal_group_name=self.current_group_name,
+            **kwargs,
+        )
+
+    def __initialize_group(self, group: SignalsGroup, title: str, summary: str, **kwargs: Any) -> None:
+        """Starts a new group."""
+        _uuid = generate_uuid4()
+
+        self.log(
+            event_uuid=_uuid,
+            level=group.name,
+            message=f"{group.name.title()} {title} started.",
+            summary=summary,
+            title=title,
+            **kwargs,
+        )
+        self.current_group_uuid = _uuid
+        self.current_group_name = title.title()
+
+    def process(self, title: str, summary: str, **kwargs: Any) -> None:
+        """Starts a new Process group."""
+        self._process_uuid = generate_uuid4()
+
+        self.log(
+            event_uuid=self.process_uuid,
+            level=SignalsGroup.PROCESS.name,
+            message=f"Process {title} started.",
+            summary=summary,
+            title=title,
+            **kwargs,
+        )
+        self.current_group_uuid = self.process_uuid
+        self.current_group_name = title.title()
+
+    def task(self, title: str, summary: str, **kwargs: Any) -> None:
+        """Starts a new Task group."""
+        self._task_uuid = generate_uuid4()
+
+        self.log(
+            event_uuid=self.task_uuid,
+            level=SignalsGroup.TASK.name,
+            message=f"Task {title} started.",
+            summary=summary,
+            title=title,
+            **kwargs,
+        )
+        self.current_group_uuid = self.task_uuid
+        self.current_group_name = title.title()
+
+    def step(self, title: str, summary: str, **kwargs: Any) -> None:
+        """Starts a new Task group."""
+        self.__initialize_group(group=SignalsGroup.STEP, title=title, summary=summary, **kwargs)
+
+    @property
+    def job_uuid(self) -> str:
+        """Returns job uuid."""
+        return self._job_uuid
+
+    @property
+    def process_uuid(self) -> str | None:
+        """Returns the Process UUID or None."""
+        return self._process_uuid
+
+    @property
+    def task_uuid(self) -> str | None:
+        """Returns the Task UUID or None."""
+        return self._task_uuid
+
+    @property
+    def step_uuid(self) -> str | None:
+        """Returns the Step UUID or None."""
+        return self._step_uuid
+
+    @property
+    def current_group_uuid(self) -> str | None:
+        """Returns the current group UUID or None."""
+        return self._current_group_uuid
+
+    @current_group_uuid.setter
+    def current_group_uuid(self, value: str | None) -> None:
+        """Sets the current group UUID."""
+        self._current_group_uuid = value
+
+    @property
+    def current_group_name(self) -> str | None:
+        """Returns the current group name or None."""
+        return self._current_group_name
+
+    @current_group_name.setter
+    def current_group_name(self, value: str | None) -> None:
+        """Sets the current group name."""
+        self._current_group_name = value
+
+    def trace(self, message: str, **kwargs: Any) -> None:
+        """Logs a trace-level message.
+
+        This method enables logging of messages with trace-level details, which can be used to trace the application's
+        execution flow in fine-grained detail. Trace logs help in debugging and understanding deep-level execution,
+        although it is commonly used in development or debug environments.
 
         Args:
-            event_type: Type of the event.
-            message: A string representing the event message to be reported.
-            **kwargs: Additional optional key-value arguments to further describe the event.
+            message: The log message string to be written.
+            **kwargs: Additional keyword arguments containing context-specific data for the log entry.
 
         Returns:
             None
         """
-        # if process was not yet started, starts it.
-        if not self.__process_uuid:
-            self.process()
-
-        # establishes the parent_uuid hierarchy if not informed.
-        if "parent_uuid" not in kwargs:
-            kwargs["parent_uuid"] = self.__current_group_uuid
-
-        super().report(
-            level=event_type,
-            message=message,
-            handler=self.__handler,
-            process_uuid=self.__process_uuid,
-            **kwargs,
-        )
-
-    def __group_level_setup(self) -> None:
-        """Sets the group levels for the reporter.
-
-        This method defines the levels of grouping used within the tracker system and assigns properties such as names,
-        numeric values, colors, and icons to these levels. Each level corresponds to a specific group in the tracker,
-        facilitating the visual distinction and organization of processes, tasks, and steps.
-        """
-        super().reporter.level(
-            name=SignalsGroup.PROCESS.name, no=SignalsGroup.PROCESS.value, color="<green>", icon="✨"
-        )
-        super().reporter.level(name=SignalsGroup.TASK.name, no=SignalsGroup.TASK.value, color="<yellow>", icon="🗒️")
-        super().reporter.level(name=SignalsGroup.STEP.name, no=SignalsGroup.STEP.value, color="<cyan>", icon="👣️")
-
-    def __signals_level_setup(self) -> None:
-        """Sets the tracker levels for the reporter."""
-        super().reporter.level(name=SignalsLevel.BUSINESS.name, no=SignalsLevel.BUSINESS.value, color="<magenta>")
-
-    def __start_group(
-        self,
-        group: SignalsGroup,
-        name: str | None = None,
-        description: str | None = None,
-        parent_uuid: str | None = None,
-        **kwargs: Any,
-    ) -> None:
-        """Starts tracking group."""
-
-        # sets the main information
-        def get_param_value(param: str | None, def_key: str, def_val: str) -> str | None:
-            """Returns default value if param is None."""
-            return param or self.__parameters.get(def_key, def_val)  # pyright: ignore [reportUnknownVariableType, reportCallIssue]
-
-        # sets the specific and detailed information
-        event_greeting: str = ""
-        event_group_uuid: str = generate_uuid4()
-        match group:
-            case SignalsGroup.PROCESS:
-                # sets name and description
-                self.__name = get_param_value(
-                    name, Constants.SIGNALS_PROCESS_NAME_KEY, Constants.SIGNALS_DEFAULT_PROCESS_NAME
-                )
-                self.__description = get_param_value(
-                    description,
-                    Constants.SIGNALS_PROCESS_DESCRIPTION_KEY,
-                    Constants.SIGNALS_DEFAULT_PROCESS_DESCRIPTION,
-                )
-                # process flow control
-                self.__parent_uuid = parent_uuid
-                self.__process_uuid = event_group_uuid
-
-                # event message for the process
-                event_greeting = (
-                    f"Process started: {self.__name} Description: {self.__description} " f"UUID: {event_group_uuid}"
-                )
-
-            case SignalsGroup.TASK:
-                if not self.__process_uuid:
-                    self.process()
-
-                # sets name and description
-                self.__name = get_param_value(
-                    name, Constants.SIGNALS_TASK_NAME_KEY, Constants.SIGNALS_DEFAULT_TASK_NAME
-                )
-                self.__description = get_param_value(
-                    description, Constants.SIGNALS_TASK_DESCRIPTION_KEY, Constants.SIGNALS_DEFAULT_TASK_DESCRIPTION
-                )
-                # task flow control
-                self.__parent_uuid = self.__process_uuid
-                self.__task_uuid = event_group_uuid
-                event_greeting = (
-                    f"Task started: {self.__name} Description: {self.__description} " f"UUID: {event_group_uuid}"
-                )
-
-            case SignalsGroup.STEP:
-                if not self.__task_uuid:
-                    self.task()
-
-                # sets name and description
-                self.__name = get_param_value(
-                    name, Constants.SIGNALS_STEP_NAME_KEY, Constants.SIGNALS_DEFAULT_STEP_NAME
-                )
-                self.__description = get_param_value(
-                    description, Constants.SIGNALS_STEP_DESCRIPTION_KEY, Constants.SIGNALS_DEFAULT_STEP_DESCRIPTION
-                )
-
-                self.__parent_uuid = self.__task_uuid
-                self.__step_uuid = event_group_uuid
-                event_greeting = (
-                    f"Step started: {self.__name} Description: {self.__description} " f"UUID: {event_group_uuid}"
-                )
-
-        self.__current_group_uuid = event_group_uuid
-        self.__event(
-            event_type=group,
-            uuid=event_group_uuid,
-            message=event_greeting,
-            parent_uuid=self.__parent_uuid,
-            name=self.__name,
-            description=self.__description,
-            **kwargs,
-        )
-
-    def process(
-        self, name: str | None = None, description: str | None = None, parent_uuid: str | None = None, **kwargs: Any
-    ) -> None:
-        """Starts the process tracking group."""
-        if self.__process_uuid:
-            self.end_task()
-
-        self.__start_group(
-            group=SignalsGroup.PROCESS,
-            name=name,
-            description=description,
-            parent_uuid=parent_uuid,
-            **kwargs,
-        )
-
-    def task(self, name: str | None = None, description: str | None = None, **kwargs: Any) -> None:
-        """Starts the task tracking group."""
-        self.__start_group(group=SignalsGroup.TASK, name=name, description=description, **kwargs)
-
-    def step(self, name: str | None = None, description: str | None = None, **kwargs: Any) -> None:
-        """Starts the step tracking group."""
-        self.__start_group(group=SignalsGroup.STEP, name=name, description=description, **kwargs)
-
-    def end_step(self) -> None:
-        """Ends the step tracking group."""
-        if self.__step_uuid:
-            self.__step_uuid = None
-            self.__current_group_uuid = self.__task_uuid or self.task()
-
-    def end_task(self) -> None:
-        """Ends the task tracking group."""
-        if self.__task_uuid:
-            self.end_step()
-            self.__task_uuid = None
-            self.__current_group_uuid = self.__process_uuid or self.process()
-
-    def end_process(self) -> None:
-        """Ends the process tracking group."""
-        if self.__process_uuid:
-            self.end_task()
-            self.__process_uuid = None
-            self.__current_group_uuid = None
-
-    def business(self, message: str, **kwargs: Any) -> None:
-        """Encapsulated trace method with automatic UID inclusion."""
-        self.__event(event_type=SignalsLevel.BUSINESS, message=message, business_context=message, **kwargs)
-
-    def trace(self, message: str, **kwargs: Any) -> None:
-        """Encapsulated trace method with automatic UID inclusion."""
-        self.__event(event_type=LoggerLevel.TRACE, message=message, **kwargs)
+        self.log(level="TRACE", message=message, **kwargs)
 
     def debug(self, message: str, **kwargs: Any) -> None:
-        """Encapsulated debug method with automatic UID inclusion."""
-        self.__event(event_type=LoggerLevel.DEBUG, message=message, **kwargs)
+        """Logs a debug message with optional keyword arguments.
+
+        This method is used to log debug-level messages to a logging system. It allows for additional contextual
+        keyword arguments to be included in the log message. Debug messages are typically used to provide diagnostic
+        information useful for debugging during development.
+
+        Args:
+            message (str): The debug message to log.
+            **kwargs (Any): Optional keyword arguments that provide additional context for the debug message.
+
+        Returns:
+            None
+        """
+        self.log(level="DEBUG", message=message, **kwargs)
 
     def info(self, message: str, **kwargs: Any) -> None:
-        """Encapsulated info method with automatic UID inclusion."""
-        self.__event(event_type=LoggerLevel.INFO, message=message, **kwargs)
+        """Logs an informational message.
+
+        This method is used to log informational messages. It allows the inclusion of additional
+        keyword arguments, which are typically used for specifying optional context or metadata.
+
+        Args:
+            message (str): The informational message to be logged.
+            **kwargs (Any): Arbitrary keyword arguments for additional context or data.
+
+        Returns:
+            None
+        """
+        self.log(level="INFO", message=message, **kwargs)
 
     def warning(self, message: str, **kwargs: Any) -> None:
-        """Encapsulated warning method with automatic UID inclusion."""
-        self.__event(event_type=LoggerLevel.WARNING, message=message, **kwargs)
+        """Logs a warning message with additional context if provided.
+
+        This method is used to log messages with a warning level of severity.
+        It can take additional keyword arguments that provide context for the
+        warning. The method formats the message and logs it appropriately
+        according to the configuration of the logging system in use.
+
+        Args:
+            message: The warning message to be logged.
+            **kwargs: Arbitrary keyword arguments containing additional context
+                or data to be included with the warning message.
+
+        Returns:
+            None
+        """
+        self.log(level="WARNING", message=message, **kwargs)
 
     def error(self, message: str, **kwargs: Any) -> None:
-        """Encapsulated error method with automatic UID inclusion."""
-        self.__event(event_type=LoggerLevel.ERROR, message=message, **kwargs)
+        """Logs an error message with the provided details.
 
-    def critical(self, message: str, exc_info: str | Exception | None = None, **kwargs: Any) -> None:
-        """Encapsulated critical method with automatic UID inclusion."""
-        self.__event(event_type=LoggerLevel.CRITICAL, message=message, exc_info=exc_info, **kwargs)
+        This method allows to log an error message with additional contextual information. It accepts a string `message`
+        as the main log content and any number of keyword arguments for context.
+
+        Args:
+            message: The error message to log.
+            **kwargs: Additional keyword arguments containing context or extra data to include in the log.
+
+        Returns:
+            None
+        """
+
+    def critical(self, message: str, **kwargs: Any) -> None:
+        """Log a critical level message.
+
+        This method is used to log a message with the critical severity level, along with any additional
+        contextual information provided via keyword arguments. It is typically used to indicate a severe
+        issue that has caused the application to be unable to continue running correctly.
+
+        Arguments:
+            message: The critical log message text.
+            kwargs: Additional contextual information to be included in the log. This can include key-value
+            pairs providing more details about the critical incident.
+
+        Returns:
+            None
+        """
+        self.log(level="CRITICAL", message=message, **kwargs)
+
+    def business(self, message: str, **kwargs: Any) -> None:
+        """Handles business logic for processing a message with optional keyword arguments.
+
+        This method is responsible for managing and executing the business logic by taking a message and handling any
+        optional keyword parameters passed alongside it. The execution of this logic can vary depending on the
+        implementation within the method, and it is intended to be customized as needed for specific use cases.
+
+        Args:
+            message: The main message or data to be processed as part of the business logic.
+            **kwargs: Additional optional keyword arguments that can be used for contextual execution
+            of the business logic.
+
+        Returns:
+            None
+        """
+        self.log(level=SignalsLevel.BUSINESS.name, message=message, **kwargs)
+
+
+if __name__ == "__main__":
+    logger.info("start")
+    output: str = Constants.SIGNALS_SINK_FORMAT_DEFAULT_VALUE
+    t = TelemetryConfig(output_format=output)
+    s = Signals(config=t)
+    s.add_sink(
+        sink=f"../../events/{generate_uuid4()}.log",
+        # format="{extra[serialized]}",
+        level=0,
+        enqueue=True,
+        catch=False,
+        serialize=True,
+    )
+    s.trace("trace message")
+    s.debug("debug message")
+    s.info("info message")
+    s.process(title="Process X", summary="This is the X process!")
+    s.warning("warning message")
+    s.error("error message")
+    s.step(title="Step Y", summary="This step is responsible for YXZ.")
+    s.critical("critical message", additional="extra data")
+    s.process(title="Process Z", summary="This is the Z process!")
+    s.business("business message")
+
+    logger.info("end")

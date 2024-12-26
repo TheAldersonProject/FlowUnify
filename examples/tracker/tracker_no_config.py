@@ -1,4 +1,4 @@
-from opsdataflow.telemetry.signals import Signals
+from opsdataflow.telemetry.signals_previous_implementation import Signals
 
 tracker = Signals()
 tracker.process(

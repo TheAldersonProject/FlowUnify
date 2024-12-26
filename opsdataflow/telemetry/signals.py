@@ -6,9 +6,8 @@ from typing import Any
 
 from loguru import logger
 
-from opsdataflow.telemetry import TelemetryConfig
+from opsdataflow.telemetry import Constants, SignalsGroup, SignalsLevel, TelemetryConfig
 from opsdataflow.tools import generate_uuid4
-from telemetry import Constants, SignalsGroup, SignalsLevel
 
 
 class Signals:

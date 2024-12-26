@@ -56,7 +56,7 @@ class Signals:
         self.__logger.add(
             sink=sys.stdout,
             level=self.__config.log_from_level,
-            format=self.__config.output_format,
+            format=self.__config.output_format or Constants.SIGNALS_SINK_FORMAT_DEFAULT_VALUE,
             colorize=True,
             serialize=False,
             backtrace=True,

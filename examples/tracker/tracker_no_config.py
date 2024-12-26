@@ -1,25 +1,13 @@
-from opsdataflow.telemetry.signals_previous_implementation import Signals
+from opsdataflow.telemetry.signals import Signals, TelemetryConfig
 
-tracker = Signals()
+t = TelemetryConfig()
+tracker = Signals(t)
 tracker.process(
-    name="I am a process. My name is ProcessMe.",
-    description="My description",
-    parent_uuid="123"
+    title="I am a process. My name is ProcessMe.",
+    summary="My description",
 )
-tracker.task()
 tracker.step(
-    name="I am a step. My name is StepMe.",
-    description="My description",
-    step_parent_uuid="123")
-tracker.end_step()
-tracker.process()
-tracker.step()
-tracker.end_task()
+    title="I am a step. My name is StepMe.",
+    summary="My description",
+)
 tracker.business("hi")
-
-# tracker.process(
-#     process_name="I am another process. My name is ProcessMe Again.",
-#     process_description="My description is different.",
-#     process_parent_uuid=None
-# )
-# tracker.event("I am a new event.")

@@ -1,15 +1,17 @@
+from opsdataflow.telemetry import Signals, TelemetryConfig
 from opsdataflow.telemetry.enums import LoggerLevel
-from opsdataflow.telemetry.signals_previous_implementation import Signals
+from opsdataflow.tools import generate_uuid4
 
-tracker_sink_format: str = (
+output: str = (
     "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>"
     " | <level>{level: <8}</level>"
     " | <level>{message}</level>"
     # " | <level>Extra: {extra}</level>"
 )
-tracker = Signals(tracker_sink_format=tracker_sink_format)
-tracker.add_sink_setup(
-    sink="../../sink/my22.log",
+t = TelemetryConfig(output_format=output)
+tracker = Signals(config=t)
+tracker.add_sink(
+    sink=f"../../events/{generate_uuid4()}.log",
     format="{extra[serialized]}",
     level=LoggerLevel.TRACE.value,
     enqueue=True,
@@ -18,31 +20,25 @@ tracker.add_sink_setup(
 )
 
 tracker.process(
-    name="I am a process. My name is ProcessMe.",
-    description="My description",
-    parent_uuid="123"
+    title="I am a process. My name is ProcessMe.",
+    summary="My description",
 )
-tracker.task(name="I am a task.", description="Task description")
+tracker.task(title="I am a task.", summary="Task description")
 tracker.step(
-    name="I am a step. My name is StepMe.",
-    description="My description",
-    step_parent_uuid="123")
+    title="I am a step. My name is StepMe.",
+    summary="My description"
+)
 tracker.trace("Trace me down.")
 tracker.debug("Bug me up.")
 tracker.info("Info-me.")
-tracker.end_step()
-tracker.end_process()
 tracker.warning("Life without a warning.")
 tracker.error("You've got error.")
-tracker.end_process()
-tracker = Signals()
 tracker.trace("1 - Hello World Trace!")
 tracker.debug("2 - Hello World Debug!")
 tracker.info("3 - Hello World Info!")
 tracker.business("I'll give you the context!")
 tracker.warning("4 - Hello World Warning!")
 tracker.error("5 - Hello World Error!", additional="Oh my gosh, an error!!!")
-tracker.step()
 
 # tracker.end_step()
 # tracker.event("Back to task")

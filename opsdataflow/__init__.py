@@ -1,5 +1,5 @@
 """DataFlow common tools."""
 
-from opsdataflow.telemetry.signals_previous_implementation import Signals
+from opsdataflow.telemetry.signals import Signals
 
 __all__ = ["Signals"]

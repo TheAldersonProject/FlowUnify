@@ -1,6 +1,6 @@
-from opsdataflow.event_track.tracker import Tracker
+from opsdataflow.telemetry.signals import Signals
 
-tracker = Tracker()
+tracker = Signals()
 tracker.process(
     name="I am a process. My name is ProcessMe.",
     description="My description",

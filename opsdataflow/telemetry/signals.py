@@ -2,18 +2,15 @@
 
 from typing import Any
 
-from opsdataflow.event_track.configuration import Configuration
-from opsdataflow.event_track.constants import Constants
-from opsdataflow.event_track.enums import Handler, LoggerLevel, TrackerGroup, TrackerLevel
-from opsdataflow.tools import singleton
-from opsdataflow.tools.uuid import generate_uuid4
+from opsdataflow.telemetry import Configuration, Constants, Handler, LoggerLevel, TrackerGroup, TrackerLevel
+from opsdataflow.tools import generate_uuid4, singleton
 
 
 @singleton
-class Tracker(Configuration):
+class Signals(Configuration):
     """Tracker class."""
 
-    def __init__(self, handler: Handler = Handler.TRACKER, **kwargs: Any) -> None:
+    def __init__(self, app_name: str | None = None, handler: Handler = Handler.TRACKER, **kwargs: Any) -> None:
         """Logger class init method."""
         # instance configuration
         self.__logger: Any = None
@@ -23,7 +20,7 @@ class Tracker(Configuration):
         self.__handler_uuid: str = generate_uuid4()
 
         # super class initialization
-        super().__init__(handler=handler, **kwargs)
+        super().__init__(handler=handler, app_name=app_name, **kwargs)
 
         # build general parameters
         self.__parameters: dict[str, Any] = super().build(**kwargs)

@@ -46,12 +46,12 @@ README_TEMPLATE: Final[str] = """
 Basic usage example:
 
 ```python
-from opsdataflow import event_track
+from opsdataflow import telemetry
 
-event_track.start(**options)
-event_track.event("Here goes the final message")
-event_track.task("My task", "Task message")
-event_track.step("My step under my task", "Step message")
+telemetry.start(**options)
+telemetry.event("Here goes the final message")
+telemetry.task("My task", "Task message")
+telemetry.step("My step under my task", "Step message")
 ```
 
 ## 🛠 Development

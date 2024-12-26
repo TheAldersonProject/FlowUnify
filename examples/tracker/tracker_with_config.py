@@ -1,5 +1,5 @@
-from opsdataflow.event_track.enums import LoggerLevel
-from opsdataflow.event_track.tracker import Tracker
+from opsdataflow.telemetry.enums import LoggerLevel
+from opsdataflow.telemetry.signals import Signals
 
 tracker_sink_format: str = (
     "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>"
@@ -7,7 +7,7 @@ tracker_sink_format: str = (
     " | <level>{message}</level>"
     # " | <level>Extra: {extra}</level>"
 )
-tracker = Tracker(tracker_sink_format=tracker_sink_format)
+tracker = Signals(tracker_sink_format=tracker_sink_format)
 tracker.add_sink_setup(
     sink="../../sink/my22.log",
     format="{extra[serialized]}",
@@ -35,7 +35,7 @@ tracker.end_process()
 tracker.warning("Life without a warning.")
 tracker.error("You've got error.")
 tracker.end_process()
-tracker = Tracker()
+tracker = Signals()
 tracker.trace("1 - Hello World Trace!")
 tracker.debug("2 - Hello World Debug!")
 tracker.info("3 - Hello World Info!")

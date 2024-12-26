@@ -8,8 +8,8 @@ from typing import Any
 
 from loguru import logger
 
-from opsdataflow.event_track.constants import Constants
-from opsdataflow.event_track.enums import Handler, LoggerLevel, TrackerGroup, TrackerLevel
+from opsdataflow.telemetry.constants import Constants
+from opsdataflow.telemetry.enums import Handler, LoggerLevel, TrackerGroup, TrackerLevel
 from opsdataflow.tools.uuid import generate_uuid4
 
 
@@ -26,10 +26,11 @@ class Configuration:
         _logger: The Loguru logger instance used for logging.
     """
 
-    def __init__(self, handler: Handler, **kwargs: Any) -> None:
+    def __init__(self, app_name: str | None, handler: Handler, **kwargs: Any) -> None:
         """Logger class init method."""
         self.__handler_uuid: str = kwargs.get(Constants.HANDLER_UUID_KEY, "")
         self.__parent_handler_uuid: str | None = kwargs["parent_handler_uuid"] if "parent_uuid" in kwargs else None
+        self._app_name: str = app_name or Constants.TRACKER_DEFAULT_APP_NAME
         self._logger = logger
 
         # general service configuration
@@ -81,6 +82,7 @@ class Configuration:
     def __handler_default_sink_configuration(self, **kwargs: Any) -> None:
         """Set the configuration for Reporter sink."""
         self._logger.bind(
+            app_name=self._app_name,
             event_uuid="",
             parent_handler_uuid="",
             parent_uuid="",

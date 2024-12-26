@@ -5,7 +5,7 @@
 
 from typing import Any, ClassVar
 
-from opsdataflow.event_track.enums import Handler
+from opsdataflow.telemetry.enums import Handler
 
 
 class Constants:
@@ -48,6 +48,7 @@ class Constants:
     TRACKER_STEP_DESCRIPTION_KEY: str = "step_description"
 
     # tracker default values
+    TRACKER_DEFAULT_APP_NAME: str = "App name not informed"
     TRACKER_DEFAULT_PROCESS_NAME: str = "Process name not informed"
     TRACKER_DEFAULT_PROCESS_DESCRIPTION: str = "Process description not informed"
     TRACKER_DEFAULT_TASK_NAME: str = "Task name not informed"

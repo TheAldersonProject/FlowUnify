@@ -1,6 +1,6 @@
 from opsdataflow.telemetry.signals import Signals, TelemetryConfig
 
-t = TelemetryConfig()
+t = TelemetryConfig(app_name="My little app.", environment="Dreamland")
 tracker = Signals(t)
 tracker.process(
     title="I am a process. My name is ProcessMe.",

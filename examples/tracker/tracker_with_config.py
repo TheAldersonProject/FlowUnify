@@ -1,33 +1,22 @@
+"""Example of signals usage."""  # noqa: INP001
+
 from opsdataflow.telemetry import Signals, TelemetryConfig
-from opsdataflow.telemetry.enums import LoggerLevel
-from opsdataflow.tools import generate_uuid4
 
 output: str = (
     "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>"
     " | <level>{level: <8}</level>"
     " | <level>{message}</level>"
-    # " | <level>Extra: {extra}</level>"
+    " | <level>Extra: {extra}</level>"
 )
-t = TelemetryConfig(output_format=output)
+t = TelemetryConfig(app_name="MyExample", environment="Dev-Environment", output_format=output)
 tracker = Signals(config=t)
-tracker.add_sink(
-    sink=f"../../events/{generate_uuid4()}.log",
-    format="{extra[serialized]}",
-    level=LoggerLevel.TRACE.value,
-    enqueue=True,
-    catch=False,
-    serialize=True,
-)
 
 tracker.process(
     title="I am a process. My name is ProcessMe.",
     summary="My description",
 )
 tracker.task(title="I am a task.", summary="Task description")
-tracker.step(
-    title="I am a step. My name is StepMe.",
-    summary="My description"
-)
+tracker.step(title="I am a step. My name is StepMe.", summary="My description")
 tracker.trace("Trace me down.")
 tracker.debug("Bug me up.")
 tracker.info("Info-me.")
@@ -53,6 +42,3 @@ tracker.error("5 - Hello World Error!", additional="Oh my gosh, an error!!!")
 #     process_parent_uuid=None
 # )
 # tracker.event("I am a new event.")
-
-
-

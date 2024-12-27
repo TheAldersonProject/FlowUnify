@@ -44,6 +44,9 @@ class Signals:
         self.__setup_signals_event_types()
         self.__setup_signals_event_groups()
 
+        # greeting with job uuid
+        self.info(f"Job started with UUID: {self.job_uuid}")
+
     def __setup_logger_main_configurations(self) -> None:
         """Sets the logger basic configuration."""
         self.__logger = logger.bind(

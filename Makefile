@@ -61,6 +61,7 @@ install:
 	python3 -m pip install uv
 	uv python install $(UV_PY_INSTALL_VERSION)
 	uv venv $(UV_PY_VERSION) $(UV_ENV_ARGS)
+	uv run python -m ensurepip --upgrade
 	uv sync
 
 dev-install: install

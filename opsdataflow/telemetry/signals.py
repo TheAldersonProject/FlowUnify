@@ -1,12 +1,15 @@
 """Signals implementation."""
 
+import os
 import sys
 from datetime import UTC, datetime
 from typing import Any
 
 from loguru import logger
+from loki_logger_handler.formatters.loguru_formatter import LoguruFormatter  # pyright: ignore[reportMissingTypeStubs]
+from loki_logger_handler.loki_logger_handler import LokiLoggerHandler  # pyright: ignore[reportMissingTypeStubs]
 
-from opsdataflow.telemetry import Constants, SignalsGroup, SignalsLevel, TelemetryConfig
+from opsdataflow.telemetry import Constants, LoggerLevel, SignalsGroup, SignalsLevel, TelemetryConfig
 from opsdataflow.tools import generate_uuid4
 
 
@@ -15,6 +18,7 @@ class Signals:
 
     def __init__(self, config: TelemetryConfig, **kwargs: Any) -> None:
         """Initializes Signals."""
+        os.environ["LOKI_URL"] = "http://192.168.200.61:3100/loki/api/v1/push"
         self.__config: TelemetryConfig = config
         self.__logger = logger
 
@@ -33,6 +37,7 @@ class Signals:
 
         # setup logger
         self.__setup_logger_main_configurations()
+        self.__setup_loki_server(url=os.environ["LOKI_URL"])
         self.__setup_logger_default_output_sink(**kwargs)
 
         # setup signals.
@@ -45,11 +50,24 @@ class Signals:
             app_name=self.__config.app_name,
             event_uuid="",
             job_uuid=self.job_uuid,
-            parent_uuid=self.current_group_uuid,
+            parent_uuid=self.current_group_uuid or self.job_uuid,
             signal_group_name="",
             signal_timestamp=datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
         )
+        # self.__logger.level("TRACE")
         self.__logger.remove(0)
+
+    def __setup_loki_server(self, url: str) -> None:
+        """Setup Loki server access."""
+        # sets the LokiLoggerHandler configuration
+        custom_handler = LokiLoggerHandler(
+            url=url,
+            labels={"application": self.__config.app_name, "environment": self.__config.environment},
+            label_keys={"job_uuid", "level", "parent_uuid", "signal_group_name"},
+            timeout=10,
+            default_formatter=LoguruFormatter(),  # pyright: ignore[reportArgumentType]
+        )
+        self.__logger.configure(handlers=[{"sink": custom_handler, "serialize": True}])
 
     def __setup_logger_default_output_sink(self, **kwargs: Any) -> None:
         """Configures a sink for the logger."""
@@ -91,8 +109,8 @@ class Signals:
             level,
             message,
             event_uuid=_event_uuid,
-            parent_uuid=self._current_group_uuid,
-            signal_group_name=self.current_group_name,
+            parent_uuid=self._current_group_uuid or self.job_uuid,
+            signal_group_name=self.current_group_name or "Job",
             **kwargs,
         )
 
@@ -230,7 +248,7 @@ class Signals:
         Returns:
             None
         """
-        self.log(level="INFO", message=message, **kwargs)
+        self.log(level=LoggerLevel.INFO.name, message=message, **kwargs)
 
     def warning(self, message: str, **kwargs: Any) -> None:
         """Logs a warning message with additional context if provided.
@@ -263,6 +281,7 @@ class Signals:
         Returns:
             None
         """
+        self.log(level="ERROR", message=message, **kwargs)
 
     def critical(self, message: str, **kwargs: Any) -> None:
         """Log a critical level message.
@@ -302,16 +321,16 @@ class Signals:
 if __name__ == "__main__":
     logger.info("start")
     output: str = Constants.SIGNALS_SINK_FORMAT_DEFAULT_VALUE
-    t = TelemetryConfig(output_format=output)
+    t = TelemetryConfig(environment="Dev", app_name="Disruptive DataOps Telemetry.", output_format=output)
     s = Signals(config=t)
-    s.add_sink(
-        sink=f"../../events/{generate_uuid4()}.log",
-        # format="{extra[serialized]}",
-        level=0,
-        enqueue=True,
-        catch=False,
-        serialize=True,
-    )
+    # s.add_sink(
+    #     sink=f"../../events/{generate_uuid4()}.log",
+    #     # format="{extra[serialized]}",
+    #     level=0,
+    #     enqueue=True,
+    #     catch=False,
+    #     serialize=True,
+    # )
     s.trace("trace message")
     s.debug("debug message")
     s.info("info message")

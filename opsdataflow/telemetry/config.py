@@ -7,8 +7,9 @@ from dataclasses import dataclass
 class TelemetryConfig:
     """Telemetry."""
 
+    environment: str
+    app_name: str
     output_format: str | None = None
     log_from_level: int = 0
-    app_name: str | None = None
     parent_uuid: str | None = None
     use_singleton_design_pattern: bool = True

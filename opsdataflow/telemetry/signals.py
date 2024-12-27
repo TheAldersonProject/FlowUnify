@@ -64,7 +64,6 @@ class Signals:
             url=url,
             labels={"application": self.__config.app_name, "environment": self.__config.environment},
             label_keys={"job_uuid", "level", "parent_uuid", "signal_group_name"},
-            timeout=10,
             default_formatter=LoguruFormatter(),  # pyright: ignore[reportArgumentType]
         )
         self.__logger.configure(handlers=[{"sink": custom_handler, "serialize": True}])

@@ -24,7 +24,7 @@ class LoggerHandler:
         return self._logger
 
     def __add_level_to_logger(
-        self, level: SignalsLevel | SignalsGroup, color: str = "light-white", icon: str | None = None
+        self, level: SignalsLevel | SignalsGroup, color: str = "<light-white>", icon: str | None = None
     ) -> None:
         """Adds custom level to logger."""
         self.logger.level(name=level.name, no=level.value, color=color, icon=icon)

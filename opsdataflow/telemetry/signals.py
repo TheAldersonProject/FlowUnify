@@ -115,9 +115,9 @@ class Signals:
         """Starts a new Task group."""
         self.__initialize_group(group=SignalsGroup.TASK, title=title, summary=summary, **kwargs)
 
-    def step(self, title: str, summary: str, **kwargs: Any) -> None:
+    def step(self, title: str, summary: str | None = None, **kwargs: Any) -> None:
         """Starts a new Task group."""
-        self.__initialize_group(group=SignalsGroup.STEP, title=title, summary=summary, **kwargs)
+        self.__initialize_group(group=SignalsGroup.STEP, title=title, summary=summary or "", **kwargs)
 
     @property
     def job_uuid(self) -> str:

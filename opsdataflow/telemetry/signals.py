@@ -10,9 +10,10 @@ from loki_logger_handler.formatters.loguru_formatter import LoguruFormatter  # p
 from loki_logger_handler.loki_logger_handler import LokiLoggerHandler  # pyright: ignore[reportMissingTypeStubs]
 
 from opsdataflow.telemetry import Constants, LoggerLevel, SignalsGroup, SignalsLevel, TelemetryConfig
-from opsdataflow.tools import generate_uuid4
+from opsdataflow.tools import generate_uuid4, singleton
 
 
+@singleton
 class Signals:
     """Class for Signals."""
 

@@ -9,19 +9,18 @@ from loguru import logger
 from loki_logger_handler.formatters.loguru_formatter import LoguruFormatter  # pyright: ignore[reportMissingTypeStubs]
 from loki_logger_handler.loki_logger_handler import LokiLoggerHandler  # pyright: ignore[reportMissingTypeStubs]
 
-from opsdataflow.telemetry import Constants, LoggerLevel, SignalsGroup, SignalsLevel, TelemetryConfig
-from opsdataflow.tools import generate_uuid4, singleton
+from opsdataflow.telemetry import Constants, LoggerHandler, LoggerLevel, SignalsConfig, SignalsGroup, SignalsLevel
+from opsdataflow.tools import generate_uuid4
 
 
-@singleton
 class Signals:
     """Class for Signals."""
 
-    def __init__(self, config: TelemetryConfig, **kwargs: Any) -> None:
+    def __init__(self, config: SignalsConfig, **kwargs: Any) -> None:
         """Initializes Signals."""
         os.environ["LOKI_URL"] = "http://192.168.200.61:3100/loki/api/v1/push"
-        self.__config: TelemetryConfig = config
-        self.__logger = logger
+        self.__config: SignalsConfig = config
+        self.__logger = LoggerHandler().logger
 
         # signal attributes
         # job uuid
@@ -91,29 +90,30 @@ class Signals:
         """Adds new sink to logger."""
         self.__logger.add(**kwargs)
 
+    def __add_level_to_logger(
+        self, level: SignalsLevel | SignalsGroup, color: str = "light-white", icon: str | None = None
+    ) -> None:
+        """Adds custom level to logger."""
+        self.__logger.level(name=level.name, no=level.value, color=color, icon=icon)
+        self.__logger.debug(f"level {level.name} added to logger.")
+
     def __setup_signals_event_types(self) -> None:
         """Setup signals event types."""
         # Business signal
-        self.__logger.level(
-            name=SignalsLevel.BUSINESS.name, no=SignalsLevel.BUSINESS.value, color="<magenta>", icon="🔍"
-        )
-
+        self.__add_level_to_logger(level=SignalsLevel.BUSINESS, color="<magenta>", icon="🔍")
         # Dataset signal
-        self.__logger.level(
-            name=SignalsLevel.DATASET.name, no=SignalsLevel.DATASET.value, color="<light-white>", icon="🔍"
-        )
-
+        self.__add_level_to_logger(level=SignalsLevel.DATASET, icon="🔍")
         # Data source signal
-        self.__logger.level(
-            name=SignalsLevel.DATA_SOURCE.name, no=SignalsLevel.DATA_SOURCE.value, color="<light-white>", icon="🔍"
-        )
+        self.__add_level_to_logger(level=SignalsLevel.DATA_SOURCE, icon="🔍")
+        # Docs signal
+        self.__add_level_to_logger(level=SignalsLevel.DOCS, icon="📄")
 
     def __setup_signals_event_groups(self) -> None:
         """Setup signals event groups."""
         # Process group
-        self.__logger.level(name=SignalsGroup.PROCESS.name, no=SignalsGroup.PROCESS.value, color="<green>", icon="✨")
-        self.__logger.level(name=SignalsGroup.TASK.name, no=SignalsGroup.TASK.value, color="<yellow>", icon="🗒️")
-        self.__logger.level(name=SignalsGroup.STEP.name, no=SignalsGroup.STEP.value, color="<cyan>", icon="👣️")
+        self.__add_level_to_logger(level=SignalsGroup.PROCESS, color="<green>", icon="✨")
+        self.__add_level_to_logger(level=SignalsGroup.TASK, color="<yellow>", icon="🗒️")
+        self.__add_level_to_logger(level=SignalsGroup.STEP, color="<cyan>", icon="👣️")
 
     def log(self, level: str, message: str, event_uuid: str | None = None, **kwargs: Any) -> None:
         """Emit logs."""
@@ -341,11 +341,28 @@ class Signals:
         """
         self.log(level=SignalsLevel.DATA_SOURCE.name, message=message, **kwargs)
 
+    def docs(self, message: str, **kwargs: Any) -> None:
+        """Logs a message at the DOCS level.
+
+        This method allows logging a message with the `DOCS` level, which is a specific log level defined in the system.
+        It takes a message string as its main argument and allows for additional keyword arguments for extended
+        logging functionality. The logged message uses the `SignalsLevel.DOCS.name` level.
+
+        Args:
+          message: The message to be logged.
+          **kwargs: Additional keyword arguments for extended logging options or functionality.
+
+        Returns:
+          None
+
+        """
+        self.log(level=SignalsLevel.DOCS.name, message=message, **kwargs)
+
 
 if __name__ == "__main__":
     logger.info("start")
     output: str = Constants.SIGNALS_SINK_FORMAT_DEFAULT_VALUE
-    t = TelemetryConfig(environment="Dev", app_name="Disruptive DataOps Telemetry.", output_format=output)
+    t = SignalsConfig(environment="Dev", app_name="Disruptive DataOps Telemetry.", output_format=output)
     s = Signals(config=t)
     # s.add_sink(
     #     sink=f"../../events/{generate_uuid4()}.log",

@@ -62,13 +62,14 @@ class SignalsLevel(IntEnum):
         SECURITY (int): Events related to security.
     """
 
-    BUSINESS = 140  # Events related to business
-    DATA_SOURCE = 150  # Events related to data sources
-    DATAOPS = 160  # Events related
-    DATASET = 180  # Events related to datasets
-    DEVOPS = 190  # Events related to DevOps
+    BUSINESS = 140  # Events related to business.
+    DATA_SOURCE = 150  # Events related to data sources.
+    DATAOPS = 160  # Events related.
+    DATASET = 180  # Events related to datasets.
+    DEVOPS = 190  # Events related to DevOps.
+    DOCS = 195  # Emit signals from file content with docs.
     EVENT = 200  # Generic event, same as the "Info" level.
-    SECURITY = 210  # Events related to security
+    SECURITY = 210  # Events related to security.
 
     def __str__(self) -> str:
         """Overwrites the __str__ method to retrieve the name.title() of the severity level."""

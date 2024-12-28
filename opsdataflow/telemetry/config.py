@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class TelemetryConfig:
+class SignalsConfig:
     """Telemetry."""
 
     environment: str

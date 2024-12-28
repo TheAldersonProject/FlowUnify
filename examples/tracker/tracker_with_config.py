@@ -1,6 +1,6 @@
 """Example of signals usage."""  # noqa: INP001
 
-from opsdataflow.telemetry import Signals, TelemetryConfig
+from opsdataflow.telemetry import Signals, SignalsConfig
 
 output: str = (
     "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>"
@@ -8,7 +8,7 @@ output: str = (
     " | <level>{message}</level>"
     " | <level>Extra: {extra}</level>"
 )
-t = TelemetryConfig(app_name="MyExample", environment="Dev-Environment", output_format=output)
+t = SignalsConfig(app_name="MyExample", environment="Dev-Environment", output_format=output)
 tracker = Signals(config=t)
 
 tracker.process(

@@ -92,9 +92,19 @@ class Signals:
 
     def __setup_signals_event_types(self) -> None:
         """Setup signals event types."""
-        # Business level
+        # Business signal
         self.__logger.level(
             name=SignalsLevel.BUSINESS.name, no=SignalsLevel.BUSINESS.value, color="<magenta>", icon="🔍"
+        )
+
+        # Dataset signal
+        self.__logger.level(
+            name=SignalsLevel.DATASET.name, no=SignalsLevel.DATASET.value, color="<light-white>", icon="🔍"
+        )
+
+        # Data source signal
+        self.__logger.level(
+            name=SignalsLevel.DATA_SOURCE.name, no=SignalsLevel.DATA_SOURCE.value, color="<light-white>", icon="🔍"
         )
 
     def __setup_signals_event_groups(self) -> None:
@@ -106,12 +116,11 @@ class Signals:
 
     def log(self, level: str, message: str, event_uuid: str | None = None, **kwargs: Any) -> None:
         """Emit logs."""
-        _event_uuid: str = event_uuid or generate_uuid4()
         self.__logger.log(
             level,
             message,
-            event_uuid=_event_uuid,
-            parent_uuid=self._current_group_uuid or self.job_uuid,
+            event_uuid=event_uuid or generate_uuid4(),
+            parent_uuid=self._current_group_uuid or self.job_uuid or generate_uuid4(),
             signal_group_name=self.current_group_name or "Job",
             **kwargs,
         )
@@ -123,7 +132,7 @@ class Signals:
         self.log(
             event_uuid=_uuid,
             level=group.name,
-            message=f"{group.name.title()} {title} started.",
+            message=f"{title} started.",
             summary=summary,
             title=title,
             **kwargs,
@@ -133,33 +142,11 @@ class Signals:
 
     def process(self, title: str, summary: str, **kwargs: Any) -> None:
         """Starts a new Process group."""
-        self._process_uuid = generate_uuid4()
-
-        self.log(
-            event_uuid=self.process_uuid,
-            level=SignalsGroup.PROCESS.name,
-            message=f"Process {title} started.",
-            summary=summary,
-            title=title,
-            **kwargs,
-        )
-        self.current_group_uuid = self.process_uuid
-        self.current_group_name = title.title()
+        self.__initialize_group(group=SignalsGroup.PROCESS, title=title, summary=summary, **kwargs)
 
     def task(self, title: str, summary: str, **kwargs: Any) -> None:
         """Starts a new Task group."""
-        self._task_uuid = generate_uuid4()
-
-        self.log(
-            event_uuid=self.task_uuid,
-            level=SignalsGroup.TASK.name,
-            message=f"Task {title} started.",
-            summary=summary,
-            title=title,
-            **kwargs,
-        )
-        self.current_group_uuid = self.task_uuid
-        self.current_group_name = title.title()
+        self.__initialize_group(group=SignalsGroup.TASK, title=title, summary=summary, **kwargs)
 
     def step(self, title: str, summary: str, **kwargs: Any) -> None:
         """Starts a new Task group."""
@@ -319,6 +306,40 @@ class Signals:
         """
         self.log(level=SignalsLevel.BUSINESS.name, message=message, **kwargs)
 
+    def dataset(self, message: str, **kwargs: Any) -> None:
+        """Logs a message at the DATASET level.
+
+        This method logs a message with the log level set as DATASET. It takes a message string and any additional
+        keyword arguments, which are passed for context or specific logging configurations.
+        This functionality can be useful to track data-related events or activities within the system.
+
+        Args:
+            message: The message string to log.
+            **kwargs: Additional arguments to include in the log entry.
+
+        Returns:
+            None
+        """
+        self.log(level=SignalsLevel.DATASET.name, message=message, **kwargs)
+
+    def data_source(self, message: str, **kwargs: Any) -> None:
+        """Logs a message with the DATA_SOURCE log level.
+
+        This method allows logging messages that signify data source level
+        events using the predefined `DATA_SOURCE` level in the logging system.
+        The `message` parameter is required, and additional context can be provided
+        through keyword arguments.
+
+        Args:
+            message (str): The message to log, representing details about the data source event.
+            **kwargs (Any): Optional keyword arguments that provide additional context
+                or metadata for the log entry.
+
+        Returns:
+            None
+        """
+        self.log(level=SignalsLevel.DATA_SOURCE.name, message=message, **kwargs)
+
 
 if __name__ == "__main__":
     logger.info("start")
@@ -336,12 +357,14 @@ if __name__ == "__main__":
     s.trace("trace message")
     s.debug("debug message")
     s.info("info message")
-    s.process(title="Process X", summary="This is the X process!")
+    s.process(title="X", summary="This is the X process!")
     s.warning("warning message")
     s.error("error message")
-    s.step(title="Step Y", summary="This step is responsible for YXZ.")
+    s.step(title="Y", summary="This step is responsible for YXZ.")
     s.critical("critical message", additional="extra data")
-    s.process(title="Process Z", summary="This is the Z process!")
+    s.process(title="Z", summary="This is the Z process!")
     s.business("business message")
+    s.data_source("datasource message")
+    s.dataset("dataset message")
 
     logger.info("end")

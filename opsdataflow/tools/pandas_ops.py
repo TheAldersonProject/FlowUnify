@@ -19,7 +19,7 @@ def analyze_pandas_dataframe_and_emit_signals(analysis_df: pd.DataFrame) -> None
         for col, dtype in analysis_df.dtypes.items()  # pyright:ignore[reportUnknownMemberType, reportUnknownVariableType, reportUnknownArgumentType]
     }
 
-    log.dataset("Dataframe shape", metadata=dataframe_shape)
-    log.dataset("Dataframe columns", metadata=dataframe_columns)
-    log.dataset("Dataframe describe", metadata=dataframe_describe)
-    log.dataset("Dataframe data types", metadata=dataframe_dtypes)
+    log.log("DATASET", "Dataframe shape", metadata=dataframe_shape)
+    log.log("DATASET", "Dataframe columns", metadata=dataframe_columns)
+    log.log("DATASET", "Dataframe describe", metadata=dataframe_describe)
+    log.log("DATASET", "Dataframe data types", metadata=dataframe_dtypes)

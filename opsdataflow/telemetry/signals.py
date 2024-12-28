@@ -5,7 +5,6 @@ import sys
 from datetime import UTC, datetime
 from typing import Any
 
-from loguru import logger
 from loki_logger_handler.formatters.loguru_formatter import LoguruFormatter  # pyright: ignore[reportMissingTypeStubs]
 from loki_logger_handler.loki_logger_handler import LokiLoggerHandler  # pyright: ignore[reportMissingTypeStubs]
 
@@ -40,16 +39,12 @@ class Signals:
         self.__setup_loki_server(url=os.environ["LOKI_URL"])
         self.__setup_logger_default_output_sink(**kwargs)
 
-        # setup signals.
-        self.__setup_signals_event_types()
-        self.__setup_signals_event_groups()
-
         # greeting with job uuid
         self.info(f"Job started with UUID: {self.job_uuid}")
 
     def __setup_logger_main_configurations(self) -> None:
         """Sets the logger basic configuration."""
-        self.__logger = logger.bind(
+        self.__logger = self.__logger.bind(
             app_name=self.__config.app_name,
             event_uuid="",
             job_uuid=self.job_uuid,
@@ -85,35 +80,6 @@ class Signals:
             catch=True,
             **kwargs,
         )
-
-    def add_sink(self, **kwargs: Any) -> None:
-        """Adds new sink to logger."""
-        self.__logger.add(**kwargs)
-
-    def __add_level_to_logger(
-        self, level: SignalsLevel | SignalsGroup, color: str = "light-white", icon: str | None = None
-    ) -> None:
-        """Adds custom level to logger."""
-        self.__logger.level(name=level.name, no=level.value, color=color, icon=icon)
-        self.__logger.debug(f"level {level.name} added to logger.")
-
-    def __setup_signals_event_types(self) -> None:
-        """Setup signals event types."""
-        # Business signal
-        self.__add_level_to_logger(level=SignalsLevel.BUSINESS, color="<magenta>", icon="🔍")
-        # Dataset signal
-        self.__add_level_to_logger(level=SignalsLevel.DATASET, icon="🔍")
-        # Data source signal
-        self.__add_level_to_logger(level=SignalsLevel.DATA_SOURCE, icon="🔍")
-        # Docs signal
-        self.__add_level_to_logger(level=SignalsLevel.DOCS, icon="📄")
-
-    def __setup_signals_event_groups(self) -> None:
-        """Setup signals event groups."""
-        # Process group
-        self.__add_level_to_logger(level=SignalsGroup.PROCESS, color="<green>", icon="✨")
-        self.__add_level_to_logger(level=SignalsGroup.TASK, color="<yellow>", icon="🗒️")
-        self.__add_level_to_logger(level=SignalsGroup.STEP, color="<cyan>", icon="👣️")
 
     def log(self, level: str, message: str, event_uuid: str | None = None, **kwargs: Any) -> None:
         """Emit logs."""
@@ -360,6 +326,8 @@ class Signals:
 
 
 if __name__ == "__main__":
+    from loguru import logger
+
     logger.info("start")
     output: str = Constants.SIGNALS_SINK_FORMAT_DEFAULT_VALUE
     t = SignalsConfig(environment="Dev", app_name="Disruptive DataOps Telemetry.", output_format=output)

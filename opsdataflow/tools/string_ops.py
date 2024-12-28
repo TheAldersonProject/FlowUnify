@@ -1,5 +1,12 @@
 """Tools for working with strings."""
 
+import hashlib
+
+from opsdataflow.telemetry import LoggerHandler
+from opsdataflow.tools import generate_uuid4
+
+log = LoggerHandler().logger
+
 
 def is_empty(value: str | None) -> bool:
     """Check if a string is empty or contains only whitespace.
@@ -16,3 +23,9 @@ def is_empty(value: str | None) -> bool:
     """
     value = value.strip() if value else None
     return not value
+
+
+def obfuscate_string_using_secure_hash(value: str, secure_hash_text: str) -> str:
+    """Obfuscate string using MD5 and a secure hash."""
+    _value = value or generate_uuid4() + secure_hash_text
+    return hashlib.md5(_value.encode("utf-8")).hexdigest()  # noqa: S324

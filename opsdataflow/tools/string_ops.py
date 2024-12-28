@@ -2,7 +2,7 @@
 
 import hashlib
 
-from opsdataflow.telemetry import LoggerHandler
+from opsdataflow.telemetry.logger_handler import LoggerHandler
 from opsdataflow.tools.uuid import generate_uuid4
 
 log = LoggerHandler().logger

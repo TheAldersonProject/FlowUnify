@@ -4,7 +4,7 @@ from typing import Any
 
 import pandas as pd  # pyright:ignore[reportMissingTypeStubs]
 
-from opsdataflow.telemetry import LoggerHandler
+from opsdataflow.telemetry.logger_handler import LoggerHandler
 
 log = LoggerHandler().logger
 

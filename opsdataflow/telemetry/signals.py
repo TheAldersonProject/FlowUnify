@@ -53,7 +53,6 @@ class Signals:
             job_uuid=self.job_uuid,
             parent_uuid=self.current_group_uuid or self.job_uuid,
             signal_group_name="",
-            signal_timestamp=datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
         )
         # self.__logger.level("TRACE")
         self.__logger.remove(0)
@@ -89,9 +88,11 @@ class Signals:
         self.__logger.log(
             level,
             message,
+            message_id=integer_time_id(),
             event_uuid=event_uuid or generate_uuid4(),
             parent_uuid=self._current_group_uuid or self.job_uuid or generate_uuid4(),
             signal_group_name=self.current_group_name or "Job",
+            signal_timestamp=datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
             **kwargs,
         )
 
@@ -101,7 +102,6 @@ class Signals:
 
         self.log(
             event_uuid=_uuid,
-            message_id=integer_time_id(),
             level=group.name,
             message=f"{title} started.",
             summary=summary,

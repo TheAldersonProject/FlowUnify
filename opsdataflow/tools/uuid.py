@@ -1,6 +1,12 @@
 """UUID Generator and management."""
 
+import time
 import uuid
+
+
+def integer_time_id() -> int:
+    """Returns an integer timestamp to be used as a simple key to sort data."""
+    return int(time.time() * 1000)
 
 
 def generate_uuid4() -> str:

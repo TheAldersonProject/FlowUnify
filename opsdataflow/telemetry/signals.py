@@ -11,6 +11,7 @@ from loki_logger_handler.loki_logger_handler import LokiLoggerHandler  # pyright
 from opsdataflow.telemetry import Constants, LoggerLevel, SignalsConfig, SignalsGroup, SignalsLevel
 from opsdataflow.telemetry.logger_handler import LoggerHandler
 from opsdataflow.tools import generate_uuid4
+from opsdataflow.tools.uuid import integer_time_id
 
 
 class Signals:
@@ -48,6 +49,7 @@ class Signals:
         self.__logger = self.__logger.bind(
             app_name=self.__config.app_name,
             event_uuid="",
+            message_id=integer_time_id(),
             job_uuid=self.job_uuid,
             parent_uuid=self.current_group_uuid or self.job_uuid,
             signal_group_name="",

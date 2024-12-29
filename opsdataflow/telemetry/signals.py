@@ -49,7 +49,7 @@ class Signals:
         self.__logger = self.__logger.bind(
             app_name=self.__config.app_name,
             event_uuid="",
-            message_id=integer_time_id(),
+            message_id=0,
             job_uuid=self.job_uuid,
             parent_uuid=self.current_group_uuid or self.job_uuid,
             signal_group_name="",
@@ -101,6 +101,7 @@ class Signals:
 
         self.log(
             event_uuid=_uuid,
+            message_id=integer_time_id(),
             level=group.name,
             message=f"{title} started.",
             summary=summary,

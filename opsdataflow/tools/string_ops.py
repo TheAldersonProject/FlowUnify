@@ -25,4 +25,4 @@ def is_empty(value: str | None) -> bool:
 def obfuscate_string_using_secure_hash(value: str, secure_hash_text: str) -> str:
     """Obfuscate string using MD5 and a secure hash."""
     _value = value or generate_uuid4() + secure_hash_text
-    return hashlib.md5(_value.encode("utf-8")).hexdigest()  # noqa: S324
+    return hashlib.md5(str(_value).encode("utf-8")).hexdigest()  # noqa: S324

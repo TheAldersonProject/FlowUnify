@@ -1,0 +1,1 @@
+"""Vault connectors configuration."""

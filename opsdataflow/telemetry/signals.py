@@ -63,7 +63,7 @@ class Signals:
         custom_handler = LokiLoggerHandler(
             url=url,
             labels={"application": self.__config.app_name, "environment": self.__config.environment},
-            label_keys={"job_uuid", "level", "parent_uuid", "signal_group_name"},
+            label_keys={"job_uuid", "level", "parent_uuid", "process", "signal_group_name", "thread"},
             default_formatter=LoguruFormatter(),  # pyright: ignore[reportArgumentType]
         )
         self.__logger.configure(handlers=[{"sink": custom_handler, "serialize": True}])
@@ -311,7 +311,7 @@ class Signals:
         """
         self.log(level=SignalsLevel.DATA_SOURCE.name, message=message, **kwargs)
 
-    def docs(self, message: str, **kwargs: Any) -> None:
+    def docs(self, message: str, docs: str, **kwargs: Any) -> None:
         """Logs a message at the DOCS level.
 
         This method allows logging a message with the `DOCS` level, which is a specific log level defined in the system.
@@ -320,13 +320,14 @@ class Signals:
 
         Args:
           message: The message to be logged.
+          docs: The docs description.
           **kwargs: Additional keyword arguments for extended logging options or functionality.
 
         Returns:
           None
 
         """
-        self.log(level=SignalsLevel.DOCS.name, message=message, **kwargs)
+        self.log(level=SignalsLevel.DOCS.name, message=message, docs=docs, **kwargs)
 
 
 if __name__ == "__main__":

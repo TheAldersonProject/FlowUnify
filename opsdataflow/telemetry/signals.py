@@ -15,7 +15,7 @@ from opsdataflow.tools.uuid import integer_time_id
 
 
 class Signals:
-    """Class for Signals."""
+    """Implements the signals emitting functionality for the application."""
 
     def __init__(self, config: SignalsConfig, **kwargs: Any) -> None:
         """Initializes Signals."""
@@ -63,7 +63,7 @@ class Signals:
         custom_handler = LokiLoggerHandler(
             url=url,
             labels={"application": self.__config.app_name, "environment": self.__config.environment},
-            label_keys={"job_uuid", "level", "parent_uuid", "process", "signal_group_name", "thread"},
+            label_keys={"job_uuid", "level", "parent_uuid", "signal_group_name"},
             default_formatter=LoguruFormatter(),  # pyright: ignore[reportArgumentType]
         )
         self.__logger.configure(handlers=[{"sink": custom_handler, "serialize": True}])

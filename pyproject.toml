@@ -25,6 +25,8 @@ dependencies = [
     "tomli>=2.2.1",
     "loki-logger-handler>=1.0.2",
     "pandas>=2.2.3",
+    "hvac>=2.3.0",
+    "python-dotenv>=1.0.1",
 ]
 
 [tool.uv]

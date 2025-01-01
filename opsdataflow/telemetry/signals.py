@@ -260,6 +260,18 @@ class Signals:
         """
         self.log(level="CRITICAL", message=message, **kwargs)
 
+    def success(self, message: str, **kwargs: Any) -> None:
+        """Logs a success message with a specified level.
+
+        This method logs a success message by calling the `log` method with a preset level of "SUCCESS".
+        Additional keyword arguments can also be passed for custom usage.
+
+        Args:
+            message: The success message to be logged.
+            **kwargs: Any additional keyword arguments to be passed to the log method.
+        """
+        self.log(level="SUCCESS", message=message, **kwargs)
+
     def business(self, message: str, **kwargs: Any) -> None:
         """Handles business logic for processing a message with optional keyword arguments.
 
@@ -357,5 +369,6 @@ if __name__ == "__main__":
     s.business("business message")
     s.data_source("datasource message")
     s.dataset("dataset message")
+    s.success("success message")
 
     logger.info("end")

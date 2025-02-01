@@ -1,4 +1,4 @@
-# OpsDataFlow
+# FlowUnify
 
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-312/)
 [![License](https://img.shields.io/github/license/TheAldersonProject/OpsDataFlow)](LICENSE)
@@ -11,7 +11,7 @@ This project aims to create a centralized hub for managing data platform process
 
 ## 🚀 Features
 
-- Centralized logging solution for multi-step workflows
+- Centralized logging solution for multistep workflows
 - Unique execution ID for process tracing
 - Comprehensive debugging capabilities
 - Business outcome analysis support
@@ -21,8 +21,8 @@ This project aims to create a centralized hub for managing data platform process
 
 ### Clone the repository
 ```bash
-    git clone https://github.com/TheAldersonProject/OpsDataFlow.git
-    cd OpsDataFlow
+    git clone https://github.com/TheAldersonProject/FlowUnify.git
+    cd FlowUnify
 ```
 
 ### Use the Makefile options to install dependencies and configure the project
@@ -34,7 +34,7 @@ This project aims to create a centralized hub for managing data platform process
 Basic usage example:
 
 ```python
-from opsdataflow import telemetry
+import telemetry
 
 telemetry.start(**options)
 telemetry.event("Here goes the final message")
@@ -57,8 +57,8 @@ telemetry.step("My step under my task", "Step message")
 
 ## Project folders
 ```
-OpsDataFlow/
-├── opsdataflow/     # Source code
+FlowUnify/
+├── src/     # Source code
 ├── tests/            # Test files
 ├── docs/             # Documentation
 ├── Makefile         # Build automation

@@ -5,7 +5,7 @@
 
 from typing import Any, ClassVar
 
-from opsdataflow.telemetry.enums import Handler
+from telemetry.enums import Handler
 
 
 class Constants:

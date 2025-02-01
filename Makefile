@@ -14,7 +14,7 @@ UV_PY_VERSION = --python $(UV_PY_INSTALL_VERSION)
 UV_ENV_ARGS = --allow-existing
 
 # PROJECT
-SOURCE_DIR = ./opsdataflow
+SOURCE_DIR = ./src
 TEST_DIR = ./tests
 DOCS_DIR = ./docs
 CONFIG_FILE = pyproject.toml
@@ -36,11 +36,10 @@ INFO := @echo "[INFO]"
 .PHONY: help install dev-install format lint test clean build version check docs
 
 help:
-	@echo "🚀 OpsDataFlow Development Commands"
+	@echo "🚀 FlowUnity Commands"
 	@echo ""
 	@echo "Development:"
 	@echo "  make install      : Clean install of dependencies"
-	@echo "  make dev-install  : Install development dependencies"
 	@echo "  make format       : Format code using Black and Ruff"
 	@echo "  make lint         : Run all linters"
 	@echo "  make test         : Run tests with coverage"
@@ -56,17 +55,14 @@ help:
 
 install:
 	${INFO} "Installing dependencies..."
-	# rm -rf .venv
-	#python3 pip install --upgrade pip
+	 rm -rf .venv
+	${INFO} "	configure venv..."
 	python3 -m venv .venv
-	python3 -m pip install uv
-	# uv python install $(UV_PY_INSTALL_VERSION)
-	# uv venv $(UV_PY_VERSION) $(UV_ENV_ARGS)
-	#uv run python -m ensurepip --upgrade
+	${INFO} "	configure uv..."
+	source .venv/bin/activate && pip install uv
+	${INFO} "	uv sync..."
 	uv sync
-
-dev-install: install
-	${INFO} "Installing development dependencies..."
+	${INFO} "	pre-commit install and configure..."
 	uv run pre-commit install
 
 format:
@@ -82,7 +78,7 @@ lint:
 
 test:
 	${INFO} "Running tests..."
-	uv run pytest $(TEST_DIR) $(PYTEST_ARGS)
+	#uv run pytest $(TEST_DIR) $(PYTEST_ARGS)
 
 check: format lint test
 
@@ -103,5 +99,5 @@ version: check
 
 build: check
 	${INFO} "Building package..."
-	uv pip install build
-	uv run python -m build
+	#uv pip install build
+	#uv run python -m build

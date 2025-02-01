@@ -27,7 +27,7 @@ def main() -> None:
         long_description=open("README.md").read(),  # noqa: PTH123, SIM115
         long_description_content_type="text/markdown",
         url="https://github.com/TheAldersonProject/OpsDataFlow",
-        packages=find_packages(include=["opsdataflow*"]),
+        packages=find_packages(include=["src*"]),
         package_data={
             "": ["LICENSE", "README.md"],
             "typings": ["**/*.pyi"],  # Include all .pyi files in typings

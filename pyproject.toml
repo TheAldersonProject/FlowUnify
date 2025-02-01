@@ -1,5 +1,5 @@
-    [project]
-name = "OpsDataFlow"
+[project]
+name = "FlowUnity"
 authors = [
   { email = "thiago@thir.info" },
   { name = "Thiago Dias" }
@@ -45,7 +45,7 @@ dev-dependencies = [
 ]
 
 [tool.ruff]
-src = ["opsdataflow"]
+src = ["src"]
 line-length = 120
 show-fixes = true
 unsafe-fixes = true
@@ -60,7 +60,18 @@ exclude = [
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["COM812", "ISC001", "G002", "G004", "C408", "S101", "ERA001", "ANN401", "EM102", "TRY003"]
+ignore = [
+    "COM812",  # missing-trailing-comma (COM812)
+    "ISC001",  # single-line-implicit-string-concatenation (ISC001)
+    "G002",  # logging-percent-format (G002)
+    "G004",  # logging-f-string (G004)
+    "C408",  # unnecessary-collection-call (C408)
+    "S101",  # assert (S101)
+    "ERA001",  # commented-out-code (ERA001)
+    "ANN401",  # any-type (ANN401)
+    "EM102",  # f-string-in-exception (EM102)
+    "TRY003"  # raise-vanilla-args (TRY003)
+]
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -74,8 +85,15 @@ convention = "google"
 [tool.ruff.lint.pylint]
 max-args = 10
 
+[tool.ruff.lint.isort]
+combine-as-imports = true
+split-on-trailing-comma = true
+relative-imports-order = "closest-to-furthest"
+force-single-line = false
+force-wrap-aliases = false
+
 [tool.pyright]
-include = ["opsdataflow"]
+include = ["src"]
 exclude = [
     "**/__pycache__",
     "**/tests",
@@ -110,13 +128,6 @@ applyFixes = true
 [tool.black]
 line-length = 120
 target-version = ['py312']
-
-[tool.ruff.lint.isort]
-combine-as-imports = true
-split-on-trailing-comma = true
-relative-imports-order = "closest-to-furthest"
-force-single-line = false
-force-wrap-aliases = false
 
 [tool.gitchangelog]
 output_file = "CHANGELOG.md"

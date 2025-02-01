@@ -8,10 +8,10 @@ from typing import Any
 from loki_logger_handler.formatters.loguru_formatter import LoguruFormatter  # pyright: ignore[reportMissingTypeStubs]
 from loki_logger_handler.loki_logger_handler import LokiLoggerHandler  # pyright: ignore[reportMissingTypeStubs]
 
-from opsdataflow.telemetry import Constants, LoggerLevel, SignalsConfig, SignalsGroup, SignalsLevel
-from opsdataflow.telemetry.logger_handler import LoggerHandler
-from opsdataflow.tools import generate_uuid4
-from opsdataflow.tools.uuid import integer_time_id
+from telemetry import Constants, LoggerLevel, SignalsConfig, SignalsGroup, SignalsLevel
+from telemetry.logger_handler import LoggerHandler
+from tools import generate_uuid4
+from tools.uuid import integer_time_id
 
 
 class Signals:

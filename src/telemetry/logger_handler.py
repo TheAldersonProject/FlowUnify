@@ -4,8 +4,8 @@ from typing import Any
 
 from loguru import logger as loguru_logger
 
-from opsdataflow.telemetry.enums import SignalsGroup, SignalsLevel
-from opsdataflow.tools import singleton
+from telemetry.enums import SignalsGroup, SignalsLevel
+from tools import singleton
 
 
 @singleton

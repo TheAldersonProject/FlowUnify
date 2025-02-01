@@ -2,7 +2,7 @@
 
 import hashlib
 
-from opsdataflow.tools.uuid import generate_uuid4
+from tools.uuid import generate_uuid4
 
 
 def is_empty(value: str | None) -> bool:

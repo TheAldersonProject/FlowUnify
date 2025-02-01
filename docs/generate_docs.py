@@ -46,7 +46,7 @@ README_TEMPLATE: Final[str] = """
 Basic usage example:
 
 ```python
-from opsdataflow import telemetry
+from src import telemetry
 
 telemetry.start(**options)
 telemetry.event("Here goes the final message")
@@ -113,7 +113,7 @@ def generate_readme(config: dict[str, Any]) -> None:
     python_version: str = project_info.get("requires-python", "")
 
     readme_content = README_TEMPLATE.format(
-        repo_name="OpsDataFlow", source_dir="opsdataflow", description=description, python_version=python_version
+        repo_name="OpsDataFlow", source_dir="src", description=description, python_version=python_version
     )
 
     with open("README.md", "w", encoding="utf-8") as f:  # noqa: PTH123

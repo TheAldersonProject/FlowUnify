@@ -1,6 +1,6 @@
 """Example of signals usage."""  # noqa: INP001
 
-from opsdataflow.telemetry import Signals, SignalsConfig
+from telemetry import Signals, SignalsConfig
 
 output: str = (
     "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>"

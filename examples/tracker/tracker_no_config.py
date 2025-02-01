@@ -1,4 +1,4 @@
-from opsdataflow.telemetry.signals import Signals, SignalsConfig
+from telemetry.signals import Signals, SignalsConfig
 
 t = SignalsConfig(app_name="My little app.", environment="Dreamland")
 tracker = Signals(t)

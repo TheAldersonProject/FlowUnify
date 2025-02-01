@@ -57,11 +57,12 @@ help:
 install:
 	${INFO} "Installing dependencies..."
 	# rm -rf .venv
-	# python3 -m pip install --upgrade pip
-	# python3 -m pip install uv
+	#python3 pip install --upgrade pip
+	python3 -m venv .venv
+	python3 -m pip install uv
 	# uv python install $(UV_PY_INSTALL_VERSION)
 	# uv venv $(UV_PY_VERSION) $(UV_ENV_ARGS)
-	uv run python -m ensurepip --upgrade
+	#uv run python -m ensurepip --upgrade
 	uv sync
 
 dev-install: install
